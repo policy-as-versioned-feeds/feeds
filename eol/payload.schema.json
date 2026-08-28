@@ -1,0 +1,37 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://policy-as-versioned.dev/schema/feeds/eol.json",
+  "title": "eol payload",
+  "description": "endoflife.date-shaped feed: component -> eol date plus the base unpatched-CVE rate at end of support. Derived from the shape platform/feeds/eol/v1,v2/eol-feed.json already published (ticket 21, ADR-0019). The entry map is `components`.",
+  "type": "object",
+  "required": ["feed_version", "published_by", "note", "components"],
+  "properties": {
+    "feed_version": { "type": "string", "minLength": 1 },
+    "published_by": { "type": "string", "minLength": 1 },
+    "note": { "type": "string", "minLength": 1 },
+    "changelog": { "type": "string" },
+    "components": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["eol_date", "source", "base_lef", "base_lm_gbp"],
+        "properties": {
+          "eol_date": { "type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$" },
+          "source": { "type": "string", "minLength": 1 },
+          "base_lef": {
+            "type": "array",
+            "minItems": 3,
+            "maxItems": 3,
+            "items": { "type": "number" }
+          },
+          "base_lm_gbp": {
+            "type": "array",
+            "minItems": 3,
+            "maxItems": 3,
+            "items": { "type": "number" }
+          }
+        }
+      }
+    }
+  }
+}

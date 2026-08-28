@@ -1,0 +1,30 @@
+# The party artefact for `feeds` (ADR-0019 point 5: discovery is publishes[]
+# on the publisher's own party artefact, and the set of signed publisher
+# artefacts IS the catalogue -- there is no central one). Validated against
+# platform/party/schema.json. Signed under this repo's gitsign tags and
+# nothing else (ADR-0012, ADR-0019 point 2).
+#
+# `feeds` publishes and inherits nothing: it is a publisher only, so it
+# carries no baseline (a baseline is an adopter's selection) and no parents.
+party: feeds
+roles: [publisher]
+inherits: []
+publishes:
+  - kind: feed
+    name: threat-register
+    path: threat-register
+    payload_schema: threat-register/payload.schema.json
+    revoked: []
+  - kind: feed
+    name: cve
+    path: cve
+    payload_schema: cve/payload.schema.json
+    revoked: []
+  - kind: feed
+    name: eol
+    path: eol
+    payload_schema: eol/payload.schema.json
+    revoked: []
+overlay:
+  add: []
+  restate: []

@@ -1,0 +1,10 @@
+# What "changed" means for the EOL feed (ADR-0023, decided D2). endoflife.date
+# restates base rates often; a rate move inside 10% is not worth a review.
+# An eol_date change is not numeric, so it falls through to patch and is
+# reviewed.
+#
+# Flat key: value only -- bump.py parses this with the standard library, no
+# pyyaml on the runner.
+changed_when: "any component added or removed, or any base rate moves by more than 10%"
+entries: components
+numeric_tolerance: 0.10

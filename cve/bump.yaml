@@ -1,0 +1,5 @@
+# The bump declared for this feed's next release (ticket 04 answer point 3;
+# ADR-0019). The scheduled fetch rewrites this line in the PR it opens; a
+# human reviews it against what bump.py computed. "none" means nothing is
+# queued for release.
+bump: none

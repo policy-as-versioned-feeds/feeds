@@ -1,0 +1,10 @@
+# What "changed" means for the threat register (ADR-0023, decided D2). The
+# scheduled fetch opens a PR only when bump.py reads this file and returns
+# something other than "none"; anything sub-threshold appends one line to
+# observations/threat-register.jsonl on the observations branch instead.
+#
+# Flat key: value only -- bump.py parses this with the standard library, no
+# pyyaml on the runner.
+changed_when: "any institution added or removed, or any lef number moves by more than 10%"
+entries: institutions
+numeric_tolerance: 0.10

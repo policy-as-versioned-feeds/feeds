@@ -1,0 +1,39 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://policy-as-versioned.dev/schema/feeds/cve.json",
+  "title": "cve payload",
+  "description": "trivy/GHSA-shaped CVE feed: severity -> loss-magnitude band, cve id -> cvss/severity/epss. Derived from the shape platform/feeds/cve/v1,v2/cve-feed.json already published (ticket 21, ADR-0019). The entry map is `cves`.",
+  "type": "object",
+  "required": ["feed_version", "published_by", "note", "severity_lm_gbp", "cves"],
+  "properties": {
+    "feed_version": { "type": "string", "minLength": 1 },
+    "published_by": { "type": "string", "minLength": 1 },
+    "note": { "type": "string", "minLength": 1 },
+    "changelog": { "type": "string" },
+    "severity_lm_gbp": {
+      "type": "object",
+      "required": ["critical", "high", "medium", "low"],
+      "additionalProperties": {
+        "type": "array",
+        "minItems": 3,
+        "maxItems": 3,
+        "items": { "type": "number" }
+      }
+    },
+    "cves": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["component", "cvss", "severity", "epss", "published", "source"],
+        "properties": {
+          "component": { "type": "string", "minLength": 1 },
+          "cvss": { "type": "number" },
+          "severity": { "enum": ["critical", "high", "medium", "low"] },
+          "epss": { "type": "number" },
+          "published": { "type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$" },
+          "source": { "type": "string", "minLength": 1 }
+        }
+      }
+    }
+  }
+}

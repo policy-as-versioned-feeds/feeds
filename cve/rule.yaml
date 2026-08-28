@@ -1,0 +1,9 @@
+# What "changed" means for the CVE feed (ADR-0023, decided D2). A new CVE is
+# a minor; a withdrawn CVE is a major; a cvss or epss rescore inside 5% is
+# noise and lands on the observations branch, not in a PR.
+#
+# Flat key: value only -- bump.py parses this with the standard library, no
+# pyyaml on the runner.
+changed_when: "any cve added or removed, or any cvss/epss number moves by more than 5%"
+entries: cves
+numeric_tolerance: 0.05

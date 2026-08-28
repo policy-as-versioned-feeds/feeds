@@ -1,0 +1,122 @@
+name: fetch
+
+# The publisher's clock (ADR-0023, decision D2). Once a day, per feed: read
+# upstream, compute the bump against what is published under that feed's own
+# versioned rule.yaml, and then take exactly one of two paths.
+#
+#   bump != none  ->  open a PR carrying the new payload and the declared
+#                     bump. A HUMAN merges it, and a human then dispatches
+#                     cut-release.yml. This workflow never releases.
+#   bump == none  ->  append one JSON line to observations/<feed>.jsonl on the
+#                     `observations` branch, so a sub-threshold series
+#                     survives for scoring and is never lost to a threshold.
+#
+# D1 in one sentence: this clock appends observations and proposes changes; it
+# never commits a declaration to main. The observation commit is gitsign-signed
+# by this workflow's own Actions identity, so the lane is a cage and not a
+# policy statement.
+#
+# 03:17 UTC: off the hour, so this repo's clock does not queue behind every
+# other cron in the org. No cross-org ordering is promised (spec, ticket 28).
+
+on:
+  schedule:
+    - cron: "17 3 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+  id-token: write
+
+env:
+  GITSIGN_VERSION: 0.17.1
+  GITSIGN_SHA256: 69213a8a0813a151e5a47d0060862952ff833a845d57309dff76f7ba6600abae
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      # one job at a time: all three push the same `observations` branch, and two
+      # parallel pushes would race into a non-fast-forward rejection every day
+      max-parallel: 1
+      matrix:
+        feed: [threat-register, cve, eol]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: install pinned gitsign (binary + checksum, no marketplace action)
+        run: |
+          set -euo pipefail
+          curl -sSL -o gitsign "https://github.com/sigstore/gitsign/releases/download/v${GITSIGN_VERSION}/gitsign_${GITSIGN_VERSION}_linux_amd64"
+          echo "${GITSIGN_SHA256}  gitsign" | sha256sum -c -
+          chmod +x gitsign && sudo mv gitsign /usr/local/bin/gitsign
+
+      - name: fetch upstream and compute the bump under rule.yaml
+        id: fetch
+        run: |
+          set -euo pipefail
+          python3 "fetch/${{ matrix.feed }}.py" --observations-dir "${RUNNER_TEMP}/obs"
+
+      - name: propose the release as a PR (bump is not none -- a human merges)
+        if: steps.fetch.outputs.bump != 'none'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BUMP: ${{ steps.fetch.outputs.bump }}
+          VERSION: ${{ steps.fetch.outputs.version }}
+          PATH_CHANGED: ${{ steps.fetch.outputs.path }}
+          FEED: ${{ matrix.feed }}
+        run: |
+          set -euo pipefail
+          branch="fetch/${FEED}-${VERSION}"
+          if git ls-remote --exit-code --heads origin "${branch}" >/dev/null 2>&1; then
+            echo "${branch} already open -- nothing to propose"; exit 0
+          fi
+          git config user.name "policy-as-versioned feeds bot"
+          git config user.email "feeds-bot@${GITHUB_REPOSITORY_OWNER}.invalid"
+          git checkout -b "${branch}"
+          git add "${PATH_CHANGED}" "${FEED}/bump.yaml"
+          git -c gpg.format=x509 -c gpg.x509.program=gitsign \
+            commit -S -m "${FEED}: ${BUMP} bump to ${VERSION} from upstream"
+          git push origin "${branch}"
+          gh pr create --base main --head "${branch}" \
+            --title "${FEED}: ${BUMP} bump to ${VERSION}" \
+            --body "$(printf '%s\n' \
+              "The scheduled fetch read upstream and computed a **${BUMP}** bump against \`${FEED}/rule.yaml\`." \
+              "" \
+              "- new payload: \`${PATH_CHANGED}\`, version \`${VERSION}\`" \
+              "- \`${FEED}/bump.yaml\` now declares \`${BUMP}\` (ADR-0019: the declared bump is reviewed in the PR)" \
+              "" \
+              "Merging publishes nothing. Dispatch \`cut-release.yml\` with feed \`${FEED}\` and version \`${VERSION}\` to sign the tag.")"
+
+      - name: append the observation (bump is none -- a series, not a release)
+        if: steps.fetch.outputs.bump == 'none'
+        run: |
+          set -euo pipefail
+          line=$(cat "${RUNNER_TEMP}/obs/${{ matrix.feed }}.jsonl")
+          git config user.name "policy-as-versioned feeds bot"
+          git config user.email "feeds-bot@${GITHUB_REPOSITORY_OWNER}.invalid"
+          if git ls-remote --exit-code --heads origin observations >/dev/null 2>&1; then
+            git fetch origin observations:observations
+            git checkout observations
+          else
+            git checkout --orphan observations
+            git rm -rf --cached . >/dev/null 2>&1 || true
+            rm -rf ./* || true
+            printf '%s\n' \
+              "# observations" "" \
+              "Sub-threshold readings from .github/workflows/fetch.yml (ADR-0023, D2)." \
+              "One JSON line per feed per run. Never a declaration: nothing here is published," \
+              "pinned or enforced. The series exists so a change below a feed's threshold is" \
+              "still scoreable later." > README.md
+            git add README.md
+          fi
+          mkdir -p observations
+          printf '%s\n' "${line}" >> "observations/${{ matrix.feed }}.jsonl"
+          git add "observations/${{ matrix.feed }}.jsonl" README.md
+          git -c gpg.format=x509 -c gpg.x509.program=gitsign \
+            commit -S -m "observe ${{ matrix.feed }}: no change above threshold"
+          git push origin observations
