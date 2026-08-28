@@ -8,6 +8,7 @@
   "payload": {
     "feed_version": "v1",
     "published_by": "feeds",
+    "currency": "GBP",
     "note": "institution threat register -- annual loss-event-frequency (lef) per institution's headline threat, editorial and grounded in publicly reported incident base rates (Verizon DBIR sector breach-frequency ranges), not a live threat-intel subscription.",
     "institutions": {
       "driftwood": {

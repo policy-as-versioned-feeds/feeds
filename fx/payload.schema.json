@@ -1,0 +1,36 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://policy-as-versioned.dev/schema/feeds/fx.json",
+  "title": "fx payload",
+  "description": "One month of HMRC monthly exchange rates: units of foreign currency per one unit of `base`. Real source, https://www.gov.uk/government/collections/exchange-rates-for-customs-and-vat -- HMRC publishes a file per month at the end of the preceding month and the rates are fixed for that whole month, which is why a period is a fact of the payload and not a free-text note. Reporting currency defaults to USD and the adopters declare GBP (ticket 25); an amount in another currency needs the rate for the price's as_of date, and no rate for that date is a missing instrument that refuses (ADR-0020). The entry map is `rates`.",
+  "type": "object",
+  "required": ["source", "period", "base", "rates"],
+  "additionalProperties": false,
+  "properties": {
+    "source": {
+      "type": "string",
+      "minLength": 1,
+      "description": "The publishing authority this month was read from, verbatim."
+    },
+    "period": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])$",
+      "description": "The month these rates are in force for, YYYY-MM. A date outside it has no rate in this version."
+    },
+    "base": {
+      "type": "string",
+      "pattern": "^[A-Z]{3}$",
+      "description": "ISO 4217 code every rate is quoted against. HMRC quotes units per GBP."
+    },
+    "note": { "type": "string", "minLength": 1 },
+    "changelog": { "type": "string", "minLength": 1 },
+    "rates": {
+      "type": "object",
+      "description": "ISO 4217 code -> units of that currency per one unit of `base`. `base` itself is not listed; its rate is 1.",
+      "additionalProperties": {
+        "type": "number",
+        "exclusiveMinimum": 0
+      }
+    }
+  }
+}

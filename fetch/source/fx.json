@@ -1,0 +1,22 @@
+{
+  "source": "HMRC monthly exchange rates",
+  "period": "2026-09",
+  "base": "GBP",
+  "note": "Units of foreign currency per GBP 1, the shape HMRC publishes for customs and VAT at https://www.gov.uk/government/collections/exchange-rates-for-customs-and-vat -- one file per month, published at the end of the preceding month and fixed for the whole of that month. A price with an as_of date outside `period` has no rate here and refuses as a missing instrument (ADR-0020).",
+  "rates": {
+    "USD": 1.2915,
+    "EUR": 1.1698,
+    "CHF": 1.0874,
+    "JPY": 190.06,
+    "AUD": 1.9412,
+    "CAD": 1.7495,
+    "SEK": 12.372,
+    "NOK": 13.741,
+    "DKK": 8.7245,
+    "PLN": 5.0328,
+    "INR": 111.42,
+    "SGD": 1.6851,
+    "ZAR": 22.918,
+    "NZD": 2.1067
+  }
+}

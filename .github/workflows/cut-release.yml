@@ -22,10 +22,10 @@ on:
   workflow_dispatch:
     inputs:
       feed:
-        description: "feed being released: threat-register, cve or eol"
+        description: "feed being released: threat-register, cve, eol or fx"
         required: true
         type: choice
-        options: [threat-register, cve, eol]
+        options: [threat-register, cve, eol, fx]
       version:
         description: "semver, no leading v, e.g. 2.1.0"
         required: true

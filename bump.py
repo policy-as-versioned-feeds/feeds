@@ -13,6 +13,8 @@ The ladder, highest wins:
     payload_schema changed   major   consumers must re-read the shape
     entry removed            major   a pin that resolved stops resolving
     entry added              minor   additive, every existing pin still resolves
+    minor_when_changed       minor   the one payload field a feed declares as a
+      field changed                  minor on its own (fx: a new month)
     only numeric moves,      none    sub-threshold: an observation, not a release
       all within tolerance
     anything else            patch
@@ -93,6 +95,13 @@ def compute(old, new, rule):
     if old_payload == new_payload:
         return "none"
 
+    # One optional field per feed whose change is a minor on its own, so a feed
+    # that republishes its whole table on a period (fx: a new HMRC month) is not
+    # read as "some numbers moved". Absent from a rule.yaml, nothing changes.
+    minor_field = rule.get("minor_when_changed")
+    if minor_field and old_payload.get(minor_field) != new_payload.get(minor_field):
+        return "minor"
+
     # Same entries, same schema, some difference. It is "none" only if every
     # difference is a numeric move inside the feed's declared tolerance.
     old_numbers, new_numbers = _numbers(old_payload), _numbers(new_payload)
@@ -149,11 +158,35 @@ def selfcheck():
          feed({"driftwood": {"lef": [2, 4, 9]},
                "tuppence": {"lef": [3, 6, 14], "threat": "new wording"}}), "patch"),
     ]
+    # fx declares `minor_when_changed: period` and a zero tolerance: it is the
+    # money instrument itself, so no rate move is too small to publish.
+    fx_rule = {"entries": "rates", "numeric_tolerance": 0, "changed_when": "x",
+               "minor_when_changed": "period"}
+
+    def fx(period, rates):
+        return {"kind": "feed", "name": "fx", "version": "1.0.0",
+                "published_by": "feeds", "published_at": "2026-07-31T09:00:00+01:00",
+                "payload_schema": "fx/payload.schema.json",
+                "payload": {"source": "HMRC monthly exchange rates", "period": period,
+                            "base": "GBP", "rates": rates}}
+
+    august = fx("2026-08", {"USD": 1.2840, "EUR": 1.1735})
+    fx_cases = [
+        ("fx new month", fx("2026-09", {"USD": 1.2915, "EUR": 1.1698}), "minor"),
+        ("fx corrected rate", fx("2026-08", {"USD": 1.2841, "EUR": 1.1735}), "patch"),
+        ("fx currency added", fx("2026-08", {"USD": 1.2840, "EUR": 1.1735, "JPY": 191.42}), "minor"),
+        ("fx currency withdrawn", fx("2026-08", {"USD": 1.2840}), "major"),
+    ]
+
     for name, candidate, expected in cases:
         got = compute(base, candidate, rule)
         assert got == expected, f"{name}: expected {expected}, got {got}"
         print(f"ok  {name} -> {expected}")
-    print(f"ok  bump.py selfcheck: {len(cases)} cases")
+    for name, candidate, expected in fx_cases:
+        got = compute(august, candidate, fx_rule)
+        assert got == expected, f"{name}: expected {expected}, got {got}"
+        print(f"ok  {name} -> {expected}")
+    print(f"ok  bump.py selfcheck: {len(cases) + len(fx_cases)} cases")
 
 
 def main(argv):

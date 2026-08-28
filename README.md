@@ -1,10 +1,13 @@
 # policy-as-versioned-feeds / feeds
 
-**The publisher of the estate's three reactive feeds** — the institution threat
-register, a trivy/GHSA-shaped CVE feed, and an `endoflife.date`-shaped EOL feed.
-They used to live inside `platform/feeds/`, which made the platform both the
-substrate and a publisher. They are a party of their own now: `feeds` publishes,
-everyone else pins. *(eco-system ticket 21, [ADR-0019](https://github.com/policy-as-versioned-flux/policy-as-versioned-flux/blob/main/docs/adr/0019-one-feed-envelope-signed-by-the-tag.md))*
+**The publisher of the estate's reactive feeds** — the institution threat
+register, a trivy/GHSA-shaped CVE feed, an `endoflife.date`-shaped EOL feed, and
+`fx`, the HMRC monthly exchange rates every cross-currency price is restated
+through. The first three used to live inside `platform/feeds/`, which made the
+platform both the substrate and a publisher. They are a party of their own now:
+`feeds` publishes, everyone else pins. *(eco-system tickets 21 and 25,
+[ADR-0019](https://github.com/policy-as-versioned-flux/policy-as-versioned-flux/blob/main/docs/adr/0019-one-feed-envelope-signed-by-the-tag.md),
+[ADR-0020](https://github.com/policy-as-versioned-flux/policy-as-versioned-flux/blob/main/docs/adr/0020-a-missing-instrument-refuses-a-missing-behaviour-is-priced.md))*
 
 ## The contract
 
@@ -18,7 +21,13 @@ the gitsign tag**, and a signature cannot cover itself (ADR-0012, ADR-0019).
 <feed>/rule.yaml             what "changed" means for this feed (ADR-0023, D2)
 <feed>/bump.yaml             the bump declared for the next release; one key
 <feed>/v<MAJOR>/feed.json    a published version
+converters/<feed>.py         the publisher's own converter: the feed prices nothing
+                             until a consumer's size (or, for fx, a date) is applied
 ```
+
+`converters/README.md` says which publisher owns which converter, and names the
+three sizing rules (FCA rate bands, HIPAA's annual cap x provisions, PCI's
+size-blindness) that are deliberately **not** here.
 
 This repo publishes more than one feed, so a release tag names the feed:
 **`<feed>/vX.Y.Z`**, e.g. `cve/v2.1.0`. A single-feed publisher (`ico`, `nist`)
@@ -72,3 +81,9 @@ schema), anything else observed false. It is one of the scripts
   repo-local ed25519 demo key. One signature, the tag (ADR-0019 point 2).
 - `market-moves` is not published here yet; it arrives with the twin's
   prediction-market work.
+- **`fx` publishes one month.** The envelope keeps the latest release of a major
+  at `fx/v<MAJOR>/feed.json`, so the rates in force for `period` are the only
+  rates in the repo. A price stated as of any other month has no rate and
+  refuses as a missing instrument (ADR-0020) rather than borrowing a neighbouring
+  month's number. `converters/fx.py` names the upgrade path: a `periods:` map as
+  an fx payload major, with the same lookup.

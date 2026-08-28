@@ -34,7 +34,7 @@ if [ -z "$schema" ] || [ ! -f "$schema" ]; then
 fi
 
 echo "== envelope schema: $schema =="
-python3 - "$schema" <<'PY'
+python3 - "$schema" "${platform}/feeds/forward-intel.payload.schema.json" <<'PY'
 import json, os, re, sys
 
 schema_path = sys.argv[1]
@@ -148,12 +148,84 @@ for path in paths:
     else:
         print(f"ok  party.yaml publishes {path}")
 
+# The ADR-0021 forward-intel payload schema (2.0.0, ticket 15 amendment C10).
+# It lives beside the envelope schema in platform because it is the twin's
+# contract with every estate, not one publisher's feed; this is the script in
+# the gate that already carries a draft-07 checker, so it checks it here.
+forward_intel_path = sys.argv[2]
+if not os.path.exists(forward_intel_path):
+    print(f"no forward-intel payload schema at {forward_intel_path}")
+    sys.exit(3)
+
+forward_intel = json.load(open(forward_intel_path))
+scenario = {
+    "perspective": "driftwood",
+    "shock": "a cart PII disclosure through an unrestricted egress path",
+    "horizon": 1,
+    "lef": None,
+    "lm": {"model": "lognormal-gpd", "mu": 11.6, "sigma": 1.4,
+           "u": 250000, "xi": 0.35, "beta": 180000},
+    "currency": "GBP",
+    "curve": [
+        {"account": "baseline", "net_cost_of_risk": 412000.0},
+        {"account": "restricted", "net_cost_of_risk": 188000.0},
+        {"account": "quarantine", "net_cost_of_risk": 141000.0},
+        {"account": "isolated", "net_cost_of_risk": 203000.0},
+    ],
+    "register": [
+        {"source": "nist", "id": "cp-9", "tier": "quarantine",
+         "note": "named by the uk-gdpr higher-tier weights, no adopter scenario prices it yet"},
+    ],
+    "claim_scope": {"included": ["uk-gdpr", "nist:sc-28"], "excluded": ["pci-dss"]},
+    "derived_from": [
+        {"party": "ico", "kind": "feed", "name": "penalty-schema", "version": "3.0.0"},
+        {"party": "feeds", "kind": "feed", "name": "fx", "version": "1.0.0"},
+    ],
+}
+before = len(failures)
+check(scenario, forward_intel, "forward-intel:sample")
+if len(failures) == before:
+    print(f"ok  a twin scenario validates against {forward_intel_path}")
+
+triple = dict(scenario, lm=[80000, 340000, 2100000])
+before = len(failures)
+check(triple, forward_intel, "forward-intel:sample(lm triple)")
+if len(failures) == before:
+    print("ok  the same schema takes an lm triple as well as a lognormal-GPD severity spec")
+
+# and it bites: C10's three keys are required, so a 1.0.0-shaped payload fails.
+before = len(failures)
+old_shape = {k: v for k, v in scenario.items()
+             if k not in ("register", "claim_scope", "derived_from")}
+check(old_shape, forward_intel, "forward-intel:1.0.0-shaped")
+bitten = failures[before:]
+del failures[before:]
+if len(bitten) == 3:
+    print("ok  a 1.0.0-shaped payload fails on all three C10 keys: "
+          + "; ".join(sorted(line.split("missing required ")[-1] for line in bitten))
+          + " -- which is why C10 is one major")
+else:
+    failures.append(f"forward-intel: expected 3 C10 keys to be required, got {bitten}")
+
+if "recommended_action" in forward_intel.get("properties", {}):
+    failures.append("forward-intel: the payload carries a recommended action, and ADR-0021 says never")
+if forward_intel.get("additionalProperties") is not False:
+    failures.append("forward-intel: the payload is open, so a recommended action could ride in anyway")
+ladder = ["baseline", "restricted", "quarantine", "isolated", "infra"]
+got_ladder = (forward_intel["properties"]["register"]["items"]
+              ["properties"]["tier"]["enum"])
+if got_ladder != ladder:
+    failures.append(f"forward-intel: register tier enum is {got_ladder}, not the ladder {ladder}")
+else:
+    print(f"ok  a register entry takes a tier off the ladder {ladder}")
+
 if failures:
     for line in failures:
         print(f"not ok  {line}")
     sys.exit(1)
 PY
 schema_rc=$?
+[ $schema_rc -ne 3 ] || { echo "SKIP: the platform checkout carries no forward-intel payload schema (ADR-0021)"; exit 3; }
 [ $schema_rc -eq 0 ] || { echo "FAIL: a published feed does not match the envelope or its payload schema"; exit 1; }
 
 echo
@@ -172,5 +244,47 @@ for feed in threat-register cve eol; do
 done
 
 echo
-echo "PASS: every published feed is one envelope validated against platform/feeds/schema.json and its own payload schema; rule.yaml and bump.yaml sit beside each feed; the bump ladder holds; publishes[] names only real paths."
+echo "== fx: the rule computes a new month as a minor and a corrected rate as a patch =="
+fxwork="$(mktemp -d)"
+trap 'rm -rf "$fxwork"' EXIT
+python3 - "$fxwork" <<'PY'
+import json, sys
+work = sys.argv[1]
+published = json.load(open("fx/v1/feed.json"))
+month = dict(published, payload=dict(published["payload"],
+                                     period="2026-09",
+                                     rates=dict(published["payload"]["rates"], USD=1.2915)))
+corrected = dict(published, payload=dict(published["payload"],
+                                         rates=dict(published["payload"]["rates"], USD=1.2841)))
+json.dump(month, open(f"{work}/new-month.json", "w"))
+json.dump(corrected, open(f"{work}/corrected-rate.json", "w"))
+PY
+for case in "new-month minor" "corrected-rate patch"; do
+  set -- $case
+  got=$(python3 bump.py fx/v1/feed.json "$fxwork/$1.json" fx/rule.yaml) || {
+    echo "FAIL: bump.py could not compare the published fx month with $1"; exit 1; }
+  [ "$got" = "$2" ] || { echo "FAIL: fx/rule.yaml says $1 is a $2, bump.py computed $got"; exit 1; }
+  echo "ok  fx $1 computes $got"
+done
+
+echo
+echo "== fx: a rate lookup for a published date, and a refusal for one with no rate (ADR-0020) =="
+if ! python3 converters/fx.py selfcheck; then
+  echo "FAIL: converters/fx.py selfcheck failed -- the fx converter is what refuses a missing rate"
+  exit 1
+fi
+known=$(python3 converters/fx.py convert 1000 GBP USD 2026-08-14) || {
+  echo "FAIL: no conversion for 2026-08-14, a date the published fx feed covers"; exit 1; }
+echo "ok  1000 GBP -> $known USD on 2026-08-14, at the published HMRC rate"
+if refusal=$(python3 converters/fx.py convert 1000 GBP USD 2026-05-14 2>&1); then
+  echo "FAIL: 2026-05-14 has no published fx rate and the converter returned $refusal anyway"
+  exit 1
+fi
+case "$refusal" in
+  MISSING\ INSTRUMENT*) echo "ok  2026-05-14 refuses: $refusal" ;;
+  *) echo "FAIL: 2026-05-14 failed for some other reason than a missing instrument: $refusal"; exit 1 ;;
+esac
+
+echo
+echo "PASS: every published feed is one envelope validated against platform/feeds/schema.json and its own payload schema; rule.yaml and bump.yaml sit beside each feed; the bump ladder holds; publishes[] names only real paths; a twin scenario validates against the 2.0.0 forward-intel payload schema; fx prices a date it publishes and refuses one it does not."
 exit 0

@@ -8,6 +8,7 @@
   "payload": {
     "feed_version": "v2",
     "published_by": "feeds",
+    "currency": "GBP",
     "changelog": "v2: tuppence lef raised 3,6,14 -> 4,9,20 -- reflects the 2026 uptick in API-based account-takeover fraud reported across UK fintechs (industry roundup, not a driftwood-specific incident). Other institutions unchanged.",
     "note": "institution threat register -- annual loss-event-frequency (lef) per institution's headline threat, editorial and grounded in publicly reported incident base rates (Verizon DBIR sector breach-frequency ranges), not a live threat-intel subscription.",
     "institutions": {

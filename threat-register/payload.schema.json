@@ -4,28 +4,66 @@
   "title": "threat-register payload",
   "description": "Institution -> headline threat -> annual loss-event-frequency band. Derived from the shape platform/feeds/threat-register/v1,v2/register.json already published (ticket 21, ADR-0019). The entry map is `institutions`; rule.yaml names it as what an added or removed entry means.",
   "type": "object",
-  "required": ["feed_version", "published_by", "note", "institutions"],
+  "required": [
+    "feed_version",
+    "published_by",
+    "currency",
+    "note",
+    "institutions"
+  ],
   "properties": {
-    "feed_version": { "type": "string", "minLength": 1 },
-    "published_by": { "type": "string", "minLength": 1 },
-    "note": { "type": "string", "minLength": 1 },
-    "changelog": { "type": "string" },
+    "feed_version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "published_by": {
+      "type": "string",
+      "minLength": 1
+    },
+    "currency": {
+      "type": "string",
+      "pattern": "^[A-Z]{3}$",
+      "description": "ISO 4217 code the loss magnitudes in this register are stated in. REQUIRED: a subscriber reading a magnitude with no declared currency would have to assume its own, which mints a currency instead of converting one (ADR-0020). Composition refuses a feed that declares none."
+    },
+    "note": {
+      "type": "string",
+      "minLength": 1
+    },
+    "changelog": {
+      "type": "string"
+    },
     "institutions": {
       "type": "object",
       "additionalProperties": {
         "type": "object",
-        "required": ["threat", "flavour", "lef", "source"],
+        "required": [
+          "threat",
+          "flavour",
+          "lef",
+          "source"
+        ],
         "properties": {
-          "threat": { "type": "string", "minLength": 1 },
-          "flavour": { "type": "string", "minLength": 1 },
+          "threat": {
+            "type": "string",
+            "minLength": 1
+          },
+          "flavour": {
+            "type": "string",
+            "minLength": 1
+          },
           "lef": {
             "type": "array",
             "minItems": 3,
             "maxItems": 3,
-            "items": { "type": "number" },
+            "items": {
+              "type": "number"
+            },
             "description": "min, most-likely, max annual loss events."
           },
-          "source": { "type": "string", "minLength": 1 }
+          "source": {
+            "type": "string",
+            "minLength": 1
+          }
         }
       }
     }

@@ -1,0 +1,19 @@
+# What "changed" means for the fx feed (ADR-0023, decided D2). HMRC republishes
+# the whole table every month and the rates are fixed for that month, so:
+#
+#   a new month          minor   every existing pin still resolves, a period arrives
+#   a corrected rate     patch   HMRC restates a rate inside the published month
+#   a currency added     minor   additive
+#   a currency withdrawn major   a pin that resolved stops resolving
+#
+# numeric_tolerance is 0 on purpose: this is the money instrument itself
+# (ADR-0020), so there is no such thing as a rate move too small to publish.
+#
+# Flat key: value only -- bump.py parses this with the standard library, no
+# pyyaml on the runner. `minor_when_changed` names the one payload field whose
+# change is a minor on its own, which is how "a new month" outranks "some
+# numbers moved".
+changed_when: "a new monthly period, a currency added or withdrawn, or any published rate corrected"
+entries: rates
+numeric_tolerance: 0
+minor_when_changed: period

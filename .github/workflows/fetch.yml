@@ -38,11 +38,11 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
-      # one job at a time: all three push the same `observations` branch, and two
+      # one job at a time: every feed pushes the same `observations` branch, and two
       # parallel pushes would race into a non-fast-forward rejection every day
       max-parallel: 1
       matrix:
-        feed: [threat-register, cve, eol]
+        feed: [threat-register, cve, eol, fx]
     steps:
       - uses: actions/checkout@v4
         with:

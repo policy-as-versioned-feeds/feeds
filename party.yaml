@@ -25,6 +25,14 @@ publishes:
     path: eol
     payload_schema: eol/payload.schema.json
     revoked: []
+  # The money instrument itself (ticket 25, ADR-0020): HMRC monthly rates, so a
+  # price stated in one currency can be reported in another. A date with no
+  # published rate refuses; converters/fx.py is the converter that refuses.
+  - kind: feed
+    name: fx
+    path: fx
+    payload_schema: fx/payload.schema.json
+    revoked: []
 overlay:
   add: []
   restate: []
