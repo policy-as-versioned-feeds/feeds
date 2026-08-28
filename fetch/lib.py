@@ -93,13 +93,21 @@ def main(feed, upstream_url):
     print(f"{feed}: upstream ({upstream_url}) vs published v{current['version']} "
           f"under rule.yaml ({rule['changed_when']}) -> {verdict}")
 
+    # The observation is written on EVERY run, whatever the verdict. It used to
+    # be written only when the verdict was `none`, so the series had a hole on
+    # exactly the interesting days -- and a permanent hole for as long as a
+    # proposal sat unmerged, because the workflow's proposal step exits early
+    # when the branch is already open (review, 2026-08-28). Story 11 wants the
+    # series to survive for scoring; a series with holes where the movement was
+    # cannot be scored. The line already carries the computed bump.
+    line = observation(feed, current, verdict)
+    if not args.dry_run:
+        os.makedirs(args.observations_dir, exist_ok=True)
+        with open(os.path.join(args.observations_dir, f"{feed}.jsonl"), "a") as fh:
+            fh.write(json.dumps(line, sort_keys=True) + "\n")
+    print(json.dumps(line, sort_keys=True))
+
     if verdict == "none":
-        line = observation(feed, current, verdict)
-        if not args.dry_run:
-            os.makedirs(args.observations_dir, exist_ok=True)
-            with open(os.path.join(args.observations_dir, f"{feed}.jsonl"), "a") as fh:
-                fh.write(json.dumps(line, sort_keys=True) + "\n")
-        print(json.dumps(line, sort_keys=True))
         _github_output(bump=verdict, path="", version=current["version"])
         return 0
 

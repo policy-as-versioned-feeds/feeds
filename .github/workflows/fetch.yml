@@ -18,6 +18,12 @@ name: fetch
 #
 # 03:17 UTC: off the hour, so this repo's clock does not queue behind every
 # other cron in the org. No cross-org ordering is promised (spec, ticket 28).
+#
+# Ticket 28 / ADR-0024 added the CAGE around that observation path. The final
+# step stages only the paths in OBSERVATION_LANE below and fails the run if the
+# job left anything else in the tree, so a bug that wrote a feed, a bump or a pin
+# on the clock cannot reach any branch. The server-side half is
+# .github/rulesets/observation-lane.json, which the owner applies with `gh api`.
 
 on:
   schedule:
@@ -29,7 +35,11 @@ permissions:
   pull-requests: write
   id-token: write
 
+# The observation lane, declared once as data so the cage step and
+# verify/schedules/verify-schedules.sh read the SAME list (ADR-0024, D1). These
+# are the only paths any scheduled job in this repository may ever commit.
 env:
+  OBSERVATION_LANE: "talk/truth.log drift/samples.jsonl talk/captures observations"
   GITSIGN_VERSION: 0.17.1
   GITSIGN_SHA256: 69213a8a0813a151e5a47d0060862952ff833a845d57309dff76f7ba6600abae
 
@@ -92,31 +102,91 @@ jobs:
               "" \
               "Merging publishes nothing. Dispatch \`cut-release.yml\` with feed \`${FEED}\` and version \`${VERSION}\` to sign the tag.")"
 
-      - name: append the observation (bump is none -- a series, not a release)
-        if: steps.fetch.outputs.bump == 'none'
+      # Unconditional. The series must carry a line for every run, including the
+      # days something moved and the days a proposal was already open -- those
+      # are the days worth scoring (review, 2026-08-28).
+      - name: append the observation -- one dated line per run, whatever the bump
         run: |
           set -euo pipefail
           line=$(cat "${RUNNER_TEMP}/obs/${{ matrix.feed }}.jsonl")
-          git config user.name "policy-as-versioned feeds bot"
-          git config user.email "feeds-bot@${GITHUB_REPOSITORY_OWNER}.invalid"
+          # The fetch step writes the new payload and bump.yaml into the tree. On
+          # the day something moved, the proposal step either committed them on
+          # its own branch or exited early because that branch was already open
+          # -- and in the second case they are still sitting here. They are a
+          # DECLARATION, so this clock discards them rather than carrying them
+          # onto the observations branch (ADR-0024, D1). The reading has already
+          # been captured into ${RUNNER_TEMP}/obs above.
+          git checkout -- . >/dev/null 2>&1 || true
+          git clean -fd -e .git >/dev/null 2>&1 || true
           if git ls-remote --exit-code --heads origin observations >/dev/null 2>&1; then
             git fetch origin observations:observations
             git checkout observations
           else
             git checkout --orphan observations
             git rm -rf --cached . >/dev/null 2>&1 || true
-            rm -rf ./* || true
+            # `git clean -ffdx -e .git`, not `rm -rf ./*`: the glob does not match
+            # dot entries, so .github/ and .gitignore survived the wipe and the
+            # cage step below then read them as untracked files OUTSIDE the lane
+            # and failed the run. Every publisher's FIRST run died there, so the
+            # observations branch never came into existence at all, and the next
+            # run took the same path and died the same way (reproduced 2026-08-28).
+            git clean -ffdx -e .git >/dev/null
+            mkdir -p observations
             printf '%s\n' \
               "# observations" "" \
-              "Sub-threshold readings from .github/workflows/fetch.yml (ADR-0023, D2)." \
-              "One JSON line per feed per run. Never a declaration: nothing here is published," \
-              "pinned or enforced. The series exists so a change below a feed's threshold is" \
-              "still scoreable later." > README.md
-            git add README.md
+              "Sub-threshold readings from .github/workflows/fetch.yml (ADR-0024, D1/D2)." \
+              "One JSON line per feed per run. Never a declaration: nothing here is" \
+              "published, pinned or enforced. The series exists so that a change below a" \
+              "feed's threshold is still scoreable later." > observations/README.md
           fi
           mkdir -p observations
           printf '%s\n' "${line}" >> "observations/${{ matrix.feed }}.jsonl"
-          git add "observations/${{ matrix.feed }}.jsonl" README.md
+
+      # --- the cage (ADR-0024, D1) -------------------------------------------
+      # Only OBSERVATION_LANE paths are staged, and nothing else may be left in
+      # the tree. The proposal path above pushes a `fetch/*` branch behind a pull
+      # request and is a PROPOSAL, not a commit to a published branch; this step
+      # is what stops the observation path from ever becoming one.
+      - name: the observation cage -- a clock appends observations, never a declaration
+        run: |
+          set -euo pipefail
+          # `git reset` FIRST: the cage builds the index and nothing else. The old
+          # guard filtered `git status --porcelain` with `grep -v '^[AMD] '`, which
+          # strips exactly the staged-and-clean entries -- so a declaration any
+          # earlier step had left in the index was committed and pushed while this
+          # step printed "this clock declared nothing" (review, 2026-08-28).
+          git reset -q
+          for path in ${OBSERVATION_LANE}; do
+            # -f: talk/captures/ is gitignored for local runs; the clock is the one
+            # caller allowed to commit it.
+            if [ -e "${path}" ]; then git add -Af -- "${path}"; fi
+          done
+          # The STAGED set, judged against the same OBSERVATION_LANE list, never a
+          # second regex that could drift from it.
+          bad=""
+          for f in $(git diff --cached --name-only); do
+            ok=0
+            for path in ${OBSERVATION_LANE}; do
+              case "${f}" in "${path}"|"${path}"/*) ok=1 ;; esac
+            done
+            [ "${ok}" = 1 ] || bad="${bad} ${f}"
+          done
+          if [ -n "${bad}" ]; then
+            echo "::error::this clock staged a declaration outside the observation lane"
+            echo "${bad}"
+            exit 1
+          fi
+          outside="$(git status --porcelain --untracked-files=all | grep -v '^[AMD] ' || true)"
+          if [ -n "${outside}" ]; then
+            echo "::error::the scheduled fetch left a change outside the observation lane"
+            echo "${outside}"
+            exit 1
+          fi
+          if git diff --cached --quiet; then
+            echo "ok  nothing to observe, and nothing declared"; exit 0
+          fi
           git -c gpg.format=x509 -c gpg.x509.program=gitsign \
+            -c user.name="policy-as-versioned feeds bot" \
+            -c user.email="feeds-bot@${GITHUB_REPOSITORY_OWNER}.invalid" \
             commit -S -m "observe ${{ matrix.feed }}: no change above threshold"
           git push origin observations
