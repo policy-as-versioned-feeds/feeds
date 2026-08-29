@@ -1,0 +1,76 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://policy-as-versioned.dev/schema/feeds/market-moves.json",
+  "title": "market-moves payload",
+  "description": "A dated price SERIES per admitted prediction market, from one venue, selected by market-moves/rule.yaml and nothing else. There is no moves[] block and no probability-shaped field anywhere in this schema, on purpose: a consumer derives moves itself (the twin's twin/market_signals.py price_moves), and a price level is a biased estimator of a probability with a known sign and an unmeasured scale (Buergi, Deng & Whelan 2026; twin research 17 S3.1), so nothing here may be read as a belief. The entry map is `markets`, keyed by the venue's own market id.",
+  "type": "object",
+  "required": ["venue", "source", "selection_rule", "markets"],
+  "additionalProperties": false,
+  "properties": {
+    "venue": {
+      "enum": ["polymarket"],
+      "description": "Version 1 reads one venue. Kalshi lands as a minor bump under the same rule; corroboration is a consumer reading two series, never a publisher claim."
+    },
+    "source": {
+      "type": "string",
+      "minLength": 1,
+      "description": "The venue endpoint this corpus was read from, verbatim."
+    },
+    "selection_rule": {
+      "type": "string",
+      "pattern": "^market-moves/rule\\.yaml@[0-9]+$",
+      "description": "The versioned mechanical rule that admitted these markets. A consumer re-derives the selection from the venue corpus and this rule; a change to it is a minor bump."
+    },
+    "note": { "type": "string", "minLength": 1 },
+    "markets": {
+      "type": "object",
+      "description": "Venue market id -> the market and its dated series. The KEY is the market id, so the id is carried exactly once.",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["venue", "question", "category", "resolution_source", "observations"],
+        "additionalProperties": false,
+        "properties": {
+          "venue": { "enum": ["polymarket"] },
+          "question": {
+            "type": "string",
+            "minLength": 1,
+            "description": "The venue's own question text, verbatim."
+          },
+          "category": {
+            "type": "string",
+            "minLength": 1,
+            "description": "The venue's own category. Carried so the selection is reproducible from the payload against rule.yaml."
+          },
+          "resolution_source": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Where the market resolves from, as the venue states it. This is the evidence grade of the series: a market resolving off an official statistic is not the same instrument as one resolving off a vote of holders."
+          },
+          "observations": {
+            "type": "array",
+            "minItems": 1,
+            "description": "The dated series. Appended to, never overwritten.",
+            "items": {
+              "type": "object",
+              "required": ["date", "price_level"],
+              "additionalProperties": false,
+              "properties": {
+                "date": {
+                  "type": "string",
+                  "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$",
+                  "description": "The reading date, YYYY-MM-DD."
+                },
+                "price_level": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1,
+                  "description": "The venue's traded price for the market's yes outcome, in [0,1]. A LEVEL, never a probability: twin/market_signals.py's as_probability refuses outright rather than converting."
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

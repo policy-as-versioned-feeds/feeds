@@ -22,10 +22,10 @@ on:
   workflow_dispatch:
     inputs:
       feed:
-        description: "feed being released: threat-register, cve, eol or fx"
+        description: "feed being released: threat-register, cve, eol, fx, market-moves or news"
         required: true
         type: choice
-        options: [threat-register, cve, eol, fx]
+        options: [threat-register, cve, eol, fx, market-moves, news]
       version:
         description: "semver, no leading v, e.g. 2.1.0"
         required: true
@@ -74,6 +74,13 @@ jobs:
 
       - name: offline verify is the release gate
         run: ./verify-feeds.sh
+
+      # tickets 49 and 50: the series, the thresholds, the observation lane, the
+      # absence of niobium and the absence of a model on the clock. Offline, so a
+      # skip here would be a fault too. verify-news-headline-skill.sh is NOT run:
+      # it reads the skill in the hub checkout and would exit 3 on a runner.
+      - name: offline verify -- market-moves and news
+        run: ./verify-market-and-news.sh
 
       - name: reject a tag that already exists (no force-move, ever)
         run: |

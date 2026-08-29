@@ -1,0 +1,49 @@
+{
+  "kind": "feed",
+  "name": "market-moves",
+  "version": "1.0.0",
+  "published_by": "feeds",
+  "published_at": "2026-08-28T03:17:00+00:00",
+  "payload_schema": "market-moves/payload.schema.json",
+  "payload": {
+    "venue": "polymarket",
+    "source": "https://gamma-api.polymarket.com/markets",
+    "selection_rule": "market-moves/rule.yaml@1",
+    "note": "The three markets the mechanical rule admits from the venue corpus, each with its dated price series. The series is what is published; a MOVE is what a consumer derives from it (twin/market_signals.py). These readings are ILLUSTRATIVE, in Polymarket's published shape and magnitude, and nothing here is a fetch of Polymarket -- every feed in this estate marks its provenance the same way. Polymarket's own terms on redistributing market data are the owner's to read before the first market-moves tag is cut; until then this feed is unreleased and this file is the fixture the clock computes against.",
+    "markets": {
+      "0x7f3c9a": {
+        "venue": "polymarket",
+        "question": "Will Ofcom open an enforcement action against a major platform over age-assurance duties before 2027-01-01?",
+        "category": "regulatory",
+        "resolution_source": "Ofcom enforcement bulletin",
+        "observations": [
+          { "date": "2026-08-26", "price_level": 0.41 },
+          { "date": "2026-08-27", "price_level": 0.42 },
+          { "date": "2026-08-28", "price_level": 0.44 }
+        ]
+      },
+      "0x2b1974": {
+        "venue": "polymarket",
+        "question": "Will Brent crude settle above $95 on any day before 2026-12-31?",
+        "category": "macro",
+        "resolution_source": "ICE Brent front-month settlement price",
+        "observations": [
+          { "date": "2026-08-26", "price_level": 0.18 },
+          { "date": "2026-08-27", "price_level": 0.19 },
+          { "date": "2026-08-28", "price_level": 0.17 }
+        ]
+      },
+      "0x9ad402": {
+        "venue": "polymarket",
+        "question": "Will the EU adopt a new critical-minerals trade restriction before 2027-01-01?",
+        "category": "geopolitics",
+        "resolution_source": "Official Journal of the European Union",
+        "observations": [
+          { "date": "2026-08-26", "price_level": 0.55 },
+          { "date": "2026-08-27", "price_level": 0.58 },
+          { "date": "2026-08-28", "price_level": 0.61 }
+        ]
+      }
+    }
+  }
+}

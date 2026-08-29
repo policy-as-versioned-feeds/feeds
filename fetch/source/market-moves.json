@@ -1,0 +1,71 @@
+{
+  "_comment": "The VENUE CORPUS, not a payload: what fetch/market-moves.py reads before market-moves/rule.yaml has been applied to it. Field names are Polymarket's own gamma-API shape (id, question, category, liquidityNum, endDate, lastTradePrice, resolutionSource) so the adapter's upgrade path is a urllib GET of https://gamma-api.polymarket.com/markets and nothing else. The seven markets below are ILLUSTRATIVE, in the venue's published shape and magnitude -- this is not a fetch of Polymarket, and four of the seven are here to be REFUSED by the rule (one under the liquidity floor, one off the category list, one inside the horizon window, one beyond it), so the selection is observably mechanical rather than a list somebody chose.",
+  "as_of": "2026-08-29",
+  "venue": "polymarket",
+  "source": "https://gamma-api.polymarket.com/markets",
+  "markets": [
+    {
+      "id": "0x7f3c9a",
+      "question": "Will Ofcom open an enforcement action against a major platform over age-assurance duties before 2027-01-01?",
+      "category": "regulatory",
+      "liquidityNum": 182000,
+      "endDate": "2026-12-31",
+      "lastTradePrice": 0.46,
+      "resolutionSource": "Ofcom enforcement bulletin"
+    },
+    {
+      "id": "0x2b1974",
+      "question": "Will Brent crude settle above $95 on any day before 2026-12-31?",
+      "category": "macro",
+      "liquidityNum": 640000,
+      "endDate": "2026-12-31",
+      "lastTradePrice": 0.2,
+      "resolutionSource": "ICE Brent front-month settlement price"
+    },
+    {
+      "id": "0x9ad402",
+      "question": "Will the EU adopt a new critical-minerals trade restriction before 2027-01-01?",
+      "category": "geopolitics",
+      "liquidityNum": 96000,
+      "endDate": "2026-11-30",
+      "lastTradePrice": 0.63,
+      "resolutionSource": "Official Journal of the European Union"
+    },
+    {
+      "id": "0x11ee80",
+      "question": "Will a top-five cloud provider announce a UK region closure before 2027-01-01?",
+      "category": "technology",
+      "liquidityNum": 12400,
+      "endDate": "2026-12-31",
+      "lastTradePrice": 0.07,
+      "resolutionSource": "Provider status page or press release"
+    },
+    {
+      "id": "0x44c1a5",
+      "question": "Will the away side win the North London derby?",
+      "category": "sports",
+      "liquidityNum": 410000,
+      "endDate": "2026-10-04",
+      "lastTradePrice": 0.31,
+      "resolutionSource": "Premier League official result"
+    },
+    {
+      "id": "0x63b7de",
+      "question": "Will the Bank of England hold rates at its August meeting?",
+      "category": "macro",
+      "liquidityNum": 520000,
+      "endDate": "2026-08-31",
+      "lastTradePrice": 0.88,
+      "resolutionSource": "Bank of England MPC summary"
+    },
+    {
+      "id": "0x8cf209",
+      "question": "Will a temporal-authorisation standard be ratified by a recognised body before 2028-06-30?",
+      "category": "technology",
+      "liquidityNum": 74000,
+      "endDate": "2028-06-30",
+      "lastTradePrice": 0.22,
+      "resolutionSource": "Standards body publication record"
+    }
+  ]
+}

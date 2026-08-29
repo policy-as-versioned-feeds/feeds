@@ -1,9 +1,10 @@
 # policy-as-versioned-feeds / feeds
 
 **The publisher of the estate's reactive feeds** — the institution threat
-register, a trivy/GHSA-shaped CVE feed, an `endoflife.date`-shaped EOL feed, and
+register, a trivy/GHSA-shaped CVE feed, an `endoflife.date`-shaped EOL feed,
 `fx`, the HMRC monthly exchange rates every cross-currency price is restated
-through. The first three used to live inside `platform/feeds/`, which made the
+through, `market-moves`, a dated prediction-market price series, and `news`,
+dated statements with the place each was read. The first three used to live inside `platform/feeds/`, which made the
 platform both the substrate and a publisher. They are a party of their own now:
 `feeds` publishes, everyone else pins. *(eco-system tickets 21 and 25,
 [ADR-0019](https://github.com/policy-as-versioned-flux/policy-as-versioned-flux/blob/main/docs/adr/0019-one-feed-envelope-signed-by-the-tag.md),
@@ -44,7 +45,13 @@ and takes exactly one of two paths:
 | computed bump | what happens |
 |---|---|
 | not `none` | a PR carrying the new payload and the declared bump. A human merges it, a human dispatches `cut-release.yml`. |
-| `none` | one JSON line appended to `observations/<feed>.jsonl` on the `observations` branch, so a sub-threshold series survives for scoring. |
+| `none` | nothing is proposed. |
+
+and on **every** run, whatever the verdict, one JSON line is appended to
+`observations/<feed>.jsonl` on the `observations` branch, so a sub-threshold
+series survives for scoring. For `market-moves` and `news` that line carries the
+**reading itself** — the day's price levels, the size of the pool — because a
+hash proves only that nothing changed, and a hash is not a series.
 
 The clock **appends observations and proposes changes. It never commits a
 declaration to main and it never releases** (ADR-0023, D1 and D2).
@@ -52,12 +59,19 @@ declaration to main and it never releases** (ADR-0023, D1 and D2).
 The ladder `bump.py` walks, highest wins: a `payload_schema` change is major; an
 entry removed is major; an entry added is minor; changes that are only numeric
 moves inside the feed's declared `numeric_tolerance` are `none`; anything else is
-patch. `python3 bump.py selfcheck` asserts all of it.
+patch. A feed that publishes a dated SERIES per entry (`market-moves`) declares
+`series` and `move_threshold` instead, and the move of its latest reading is what
+decides -- appending a reading is not "some numbers moved". `payload.<entries>`
+may be a map or a list of objects each carrying an `id` (`news`'s `events[]`),
+which is the same ladder over both shapes. `python3 bump.py selfcheck` asserts
+all of it, 21 cases.
 
 ## Verify
 
 ```
-./verify-feeds.sh
+./verify-feeds.sh                  the envelope, the payload schemas, the ladder, fx
+./verify-market-and-news.sh        market-moves and news: series, rule, threshold, niobium, no model
+./verify-news-headline-skill.sh    the human-run skill's claim file, and the twin binding the series
 ```
 
 Offline, no cluster, no tag. Exit 0 observed true, exit 3 could-not-look (it
@@ -79,8 +93,37 @@ schema), anything else observed false. It is one of the scripts
   the envelope.
 - **The old `.sig` files did not come with them.** They signed the payload under a
   repo-local ed25519 demo key. One signature, the tag (ADR-0019 point 2).
-- `market-moves` is not published here yet; it arrives with the twin's
-  prediction-market work.
+- **`market-moves` reads one venue, mechanically, and publishes a SERIES.**
+  `market-moves/rule.yaml` is the whole of the selection (category list,
+  liquidity floor, horizon window, seeded volume valve) and the whole of the
+  change (`move_threshold`: five price points). There is no `moves[]` block and
+  no probability-shaped field anywhere in the payload: a consumer derives the
+  move (`twin/market_signals.py::price_moves`), and a price LEVEL is never a
+  probability -- the twin's `as_probability` refuses outright, because the
+  favourite-longshot bias makes a level a biased estimator of unknown scale,
+  worst in the low-price tail (twin research 17 S3.1). Kalshi would land as a
+  minor bump under the same rule; corroboration is a consumer reading two
+  series, never a publisher claim.
+- **Polymarket's redistribution terms are the owner's precondition for the first
+  `market-moves/*` tag** (ticket 49). They were not readable from here on
+  2026-08-29: `polymarket.com/tos` renders its text client-side and the docs
+  index publishes no terms page. Nothing is redistributed in the meantime -- the
+  committed corpus and the published series are illustrative, in the venue's
+  shape and magnitude, and no fetch of Polymarket has happened.
+- **`news` carries observed entries only**, and the entry is minimal: `id`,
+  `date`, `source`, `statement`, `provenance.url`. No STEEP tag, no severity, no
+  relevance, no subject. Every one of those is a judgement, and a judgement here
+  is a grade-5 claim the `classify-and-judge` skill produces with a human at the
+  keyboard, landing as a reviewed PR on the **adopter's** overlay. The required
+  URL is why an invented headline cannot enter: a scenario has nowhere it was
+  read. **The niobium supply shock is a scenario**, it lives in driftwood's
+  `twin/orgs/driftwood/scenarios/`, and `verify-market-and-news.sh` walks every
+  published payload to prove it is not here.
+- **No clock in this repository invokes a model.** The fetch computes a bump
+  from a rule file and appends a reading; that is all it does.
+  `verify-market-and-news.sh` asserts it of every scheduled workflow and every
+  adapter, and the skill that does the reasoning is marked
+  `disable-model-invocation: true` so nothing unattended can call it.
 - **`fx` publishes one month.** The envelope keeps the latest release of a major
   at `fx/v<MAJOR>/feed.json`, so the rates in force for `period` are the only
   rates in the repo. A price stated as of any other month has no rate and

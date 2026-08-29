@@ -52,7 +52,7 @@ jobs:
       # parallel pushes would race into a non-fast-forward rejection every day
       max-parallel: 1
       matrix:
-        feed: [threat-register, cve, eol, fx]
+        feed: [threat-register, cve, eol, fx, market-moves, news]
     steps:
       - uses: actions/checkout@v4
         with:

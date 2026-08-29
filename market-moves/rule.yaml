@@ -1,0 +1,44 @@
+# The market-moves selection and change rule (ecosystem tickets 22 and 49,
+# ADR-0023 decision D2). ONE mechanical rule over ONE venue. Nothing here is a
+# judgement: two runs against the same venue corpus admit the same markets.
+#
+# The rule is versioned and signed with the feed. A change to any field below is
+# a dated diff and a MINOR bump, because the payload carries `selection_rule`
+# and a consumer that pinned the old rule is reading a differently-selected
+# universe (bump.py's `minor_when_changed`).
+#
+# SELECTION (the benchmark-rule shape twin ticket 21 Q2 decided, and the same
+# fields twin/benchmark-selection-rule.yaml states, so the two read alike):
+#   categories        a market's own venue category must be on this list
+#   min_liquidity     the venue's own liquidity number, in USD
+#   min/max_horizon_days   days from the reading date to the market's end date
+#   max_markets + sample_seed   the seeded volume valve: if the mechanical
+#                     filter admits more than max_markets, a seeded sample cuts
+#                     it down, so the cut is reproducible and not an ad hoc trim
+#
+# CHANGE (what opens a PR):
+#   move_threshold    a selected market's LATEST price level moved at least this
+#                     much since the published series. 0.05 is five price
+#                     points. Below it, the reading appends to the observation
+#                     branch and nothing is proposed.
+#
+# The threshold is the feed's own definition of "changed" (D2), which is why it
+# lives here and not in payload.schema.json: a schema says what a document is,
+# not when it is worth releasing.
+#
+# Flat key: value only -- bump.py parses this with the standard library, no
+# pyyaml on the runner. Lists are comma-separated for the same reason.
+changed_when: "a selected market's latest price level moved at least 5 price points since the published series"
+entries: markets
+numeric_tolerance: 0
+series: observations
+series_value: price_level
+move_threshold: 0.05
+minor_when_changed: selection_rule
+categories: "geopolitics,macro,technology,corporate-outcome,regulatory"
+min_liquidity: 50000
+min_horizon_days: 7
+max_horizon_days: 365
+max_markets: 40
+sample_seed: 20260829
+rule_version: 1

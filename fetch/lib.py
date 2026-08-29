@@ -42,9 +42,20 @@ def published_versions(feed):
 
 
 def read_upstream(feed):
-    """ponytail: a committed fixture stands in for the upstream GET."""
-    with open(os.path.join(ROOT, "fetch", "source", f"{feed}.json")) as fh:
+    """ponytail: a committed fixture stands in for the upstream GET.
+
+    FEEDS_SOURCE_DIR points the read at another directory of the same fixtures,
+    which is how a verify script drives this real clock over a corpus that
+    moved without editing the committed one."""
+    source = os.environ.get("FEEDS_SOURCE_DIR") or os.path.join(ROOT, "fetch", "source")
+    with open(os.path.join(source, f"{feed}.json")) as fh:
         return json.load(fh)
+
+
+def load_rule(feed):
+    """That feed's own versioned rule file, for an adapter that applies more of
+    it than the bump (market-moves selects on its own rule)."""
+    return bump_engine.load_rule(os.path.join(ROOT, feed, "rule.yaml"))
 
 
 def next_version(version, bump):
@@ -58,20 +69,32 @@ def next_version(version, bump):
     return version
 
 
-def observation(feed, current, bump):
+def observation(feed, current, bump, reading=None):
     """One line for the observation branch: a sub-threshold reading survives
-    for scoring even though it never becomes a release (spec, story 11)."""
+    for scoring even though it never becomes a release (spec, story 11).
+
+    `reading` is the feed's own dated numbers, when the feed publishes a series
+    (market-moves) or a pool (news). Without it the line proves only that a
+    payload did not change, which is not a series anybody can score."""
     body = json.dumps(current["payload"], sort_keys=True, separators=(",", ":")).encode()
-    return {
+    line = {
         "observed_at": dt.datetime.now(dt.timezone.utc).isoformat(timespec="seconds"),
         "feed": feed,
         "published_version": current["version"],
         "bump": bump,
         "payload_sha256": hashlib.sha256(body).hexdigest(),
     }
+    if reading is not None:
+        line["reading"] = reading
+    return line
 
 
-def main(feed, upstream_url):
+def main(feed, upstream_url, build=None, reading=None):
+    """`build(published_payload, upstream)` turns a raw upstream corpus into the
+    next payload for feeds whose upstream is not already a payload (the
+    market-moves venue corpus, the news pool). `reading(payload)` is what the
+    observation line carries beside the hash. Both default to off, so the four
+    feeds that came before this are untouched."""
     parser = argparse.ArgumentParser(description=f"scheduled fetch for the {feed} feed")
     parser.add_argument("--observations-dir", default=os.path.join(ROOT, "observations"),
                         help="where to append <feed>.jsonl when the bump is none "
@@ -85,8 +108,9 @@ def main(feed, upstream_url):
         current = json.load(fh)
     rule = bump_engine.load_rule(os.path.join(ROOT, feed, "rule.yaml"))
 
+    upstream = read_upstream(feed)
     candidate = dict(current)
-    candidate["payload"] = read_upstream(feed)
+    candidate["payload"] = build(current["payload"], upstream) if build else upstream
     candidate["published_at"] = dt.datetime.now(dt.timezone.utc).isoformat(timespec="seconds")
 
     verdict = bump_engine.compute(current, candidate, rule)
@@ -100,7 +124,8 @@ def main(feed, upstream_url):
     # when the branch is already open (review, 2026-08-28). Story 11 wants the
     # series to survive for scoring; a series with holes where the movement was
     # cannot be scored. The line already carries the computed bump.
-    line = observation(feed, current, verdict)
+    line = observation(feed, current, verdict,
+                       reading(candidate["payload"]) if reading else None)
     if not args.dry_run:
         os.makedirs(args.observations_dir, exist_ok=True)
         with open(os.path.join(args.observations_dir, f"{feed}.jsonl"), "a") as fh:

@@ -15,9 +15,15 @@ The ladder, highest wins:
     entry added              minor   additive, every existing pin still resolves
     minor_when_changed       minor   the one payload field a feed declares as a
       field changed                  minor on its own (fx: a new month)
+    series move >= the       patch   a feed that publishes a SERIES declares its
+      declared threshold             own threshold (market-moves: 5 points)
     only numeric moves,      none    sub-threshold: an observation, not a release
       all within tolerance
     anything else            patch
+
+`payload.<entries>` is an entry map. A feed whose payload carries a LIST of
+objects each with an `id` (news: `events[]`) is read as the map that list keys,
+so the same ladder computes over both shapes.
 
 Envelope `version` and `published_at` are ignored: they are the release's own
 facts, not the feed's content. Only `payload_schema` and `payload` are compared.
@@ -53,6 +59,69 @@ def load_rule(path):
     return rule
 
 
+def entry_map(entries):
+    """The entry map `payload.<entries>` is, whichever of the two shapes it took.
+
+    A map is itself. A list of objects each carrying an `id` is the map that
+    list keys: news publishes `events[]` because an event is a dated line in a
+    log, not a slot somebody overwrites, and platform's market-intel keys its
+    `components` list the same way. Anything else is not an entry map.
+
+    ponytail: `id` is the only key it looks for. Upgrade path: a rule key
+    naming the field, the day a feed keys its list on something else.
+    """
+    if isinstance(entries, dict):
+        return entries
+    if isinstance(entries, list) and all(
+            isinstance(item, dict) and "id" in item for item in entries):
+        return {str(item["id"]): item for item in entries}
+    return None
+
+
+def _last(series, value_field):
+    """The most recent value in a dated series -- the reading a threshold is
+    measured against. `date` orders it, because a fetch appends and an append
+    is not a promise about order."""
+    if not series:
+        return None
+    latest = max(series, key=lambda point: point.get("date", ""))
+    return latest.get(value_field)
+
+
+def _series_verdict(old_entries, new_entries, rule):
+    """The ladder for a feed that publishes a SERIES per entry (market-moves).
+
+    Appending a reading is not "some numbers moved": the numeric leaves are at
+    new paths every day, so the generic tolerance below reads every single day
+    as a patch and the feed releases daily. This branch is what decision D2
+    means by "each feed defines changed in its own versioned rule file": the
+    move of the latest reading, against the feed's own `move_threshold`, in the
+    units the series is published in (market-moves: price points, so 0.05 is
+    five percentage points). Anything about an entry OTHER than its series is a
+    patch, because the metadata a consumer pins is not a reading.
+    """
+    threshold = float(rule["move_threshold"])
+    series_field = rule["series"]
+    value_field = rule["series_value"]
+    for key, new_entry in new_entries.items():
+        old_entry = old_entries[key]
+        if {k: v for k, v in old_entry.items() if k != series_field} != \
+           {k: v for k, v in new_entry.items() if k != series_field}:
+            return "patch"
+        old_value = _last(old_entry.get(series_field, []), value_field)
+        new_value = _last(new_entry.get(series_field, []), value_field)
+        if old_value is None or new_value is None:
+            if old_value != new_value:
+                return "patch"
+            continue
+        # rounded, because 0.38 - 0.33 is 0.049999999999999996 in binary
+        # floating point and a move of exactly the declared threshold is "at
+        # least the threshold". Six places is far below any venue's tick.
+        if round(abs(float(new_value) - float(old_value)), 6) >= threshold:
+            return "patch"
+    return "none"
+
+
 def _numbers(value, prefix=""):
     """Every numeric leaf under `value`, keyed by its path."""
     if isinstance(value, bool):
@@ -81,10 +150,12 @@ def compute(old, new, rule):
         return "major"
 
     key = rule["entries"]
-    old_entries = old.get("payload", {}).get(key, {})
-    new_entries = new.get("payload", {}).get(key, {})
-    if not isinstance(old_entries, dict) or not isinstance(new_entries, dict):
-        raise SystemExit(f"FAIL: payload.{key} is not an entry map in both feeds")
+    old_entries = entry_map(old.get("payload", {}).get(key, {}))
+    new_entries = entry_map(new.get("payload", {}).get(key, {}))
+    if old_entries is None or new_entries is None:
+        raise SystemExit(
+            f"FAIL: payload.{key} is not an entry map in both feeds -- a map, or a "
+            f"list of objects each carrying an id")
 
     if set(old_entries) - set(new_entries):
         return "major"
@@ -101,6 +172,14 @@ def compute(old, new, rule):
     minor_field = rule.get("minor_when_changed")
     if minor_field and old_payload.get(minor_field) != new_payload.get(minor_field):
         return "minor"
+
+    # A feed that publishes a dated series per entry measures its own move
+    # against its own threshold (D2). See _series_verdict.
+    if rule.get("series"):
+        if {k: v for k, v in old_payload.items() if k != key} != \
+           {k: v for k, v in new_payload.items() if k != key}:
+            return "patch"  # something outside the series changed; not a reading
+        return _series_verdict(old_entries, new_entries, rule)
 
     # Same entries, same schema, some difference. It is "none" only if every
     # difference is a numeric move inside the feed's declared tolerance.
@@ -178,6 +257,68 @@ def selfcheck():
         ("fx currency withdrawn", fx("2026-08", {"USD": 1.2840}), "major"),
     ]
 
+    # market-moves publishes a dated series per market and declares its own
+    # threshold: five price points (ecosystem ticket 49, ADR-0023 D2).
+    mm_rule = {"entries": "markets", "numeric_tolerance": 0, "changed_when": "x",
+               "series": "observations", "series_value": "price_level",
+               "move_threshold": 0.05, "minor_when_changed": "selection_rule"}
+
+    def mm(series, extra=None, selection_rule="market-moves/rule.yaml@1"):
+        market = {"venue": "polymarket", "question": "q?", "category": "geopolitics",
+                  "resolution_source": "https://example.invalid/rules",
+                  "observations": series}
+        markets = {"0xaaa": market}
+        if extra:
+            markets["0xbbb"] = dict(market, **extra)
+        return {"kind": "feed", "name": "market-moves", "version": "1.0.0",
+                "published_by": "feeds", "published_at": "2026-08-29T03:17:00+00:00",
+                "payload_schema": "market-moves/payload.schema.json",
+                "payload": {"venue": "polymarket", "selection_rule": selection_rule,
+                            "markets": markets}}
+
+    def restated_market(build, series):
+        doc = build(series)
+        doc["payload"]["markets"]["0xaaa"]["question"] = "q, restated?"
+        return doc
+
+    published_series = [{"date": "2026-08-27", "price_level": 0.31},
+                        {"date": "2026-08-28", "price_level": 0.33}]
+    published_mm = mm(published_series)
+    mm_cases = [
+        ("market-moves sub-threshold reading",
+         mm(published_series + [{"date": "2026-08-29", "price_level": 0.36}]), "none"),
+        ("market-moves reading at the threshold",
+         mm(published_series + [{"date": "2026-08-29", "price_level": 0.38}]), "patch"),
+        ("market-moves downward move over the threshold",
+         mm(published_series + [{"date": "2026-08-29", "price_level": 0.27}]), "patch"),
+        ("market-moves rule version changed",
+         mm(published_series, selection_rule="market-moves/rule.yaml@2"), "minor"),
+        ("market-moves market admitted",
+         mm(published_series, extra={"question": "a second admitted market?"}), "minor"),
+        ("market-moves question restated", restated_market(mm, published_series), "patch"),
+    ]
+
+    # news publishes events[] -- a LIST keyed by id, not a map (ticket 50).
+    news_rule = {"entries": "events", "numeric_tolerance": 0, "changed_when": "x"}
+
+    def news(events):
+        return {"kind": "feed", "name": "news", "version": "1.0.0",
+                "published_by": "feeds", "published_at": "2026-08-29T03:17:00+00:00",
+                "payload_schema": "news/payload.schema.json",
+                "payload": {"events": events}}
+
+    event = {"id": "one", "date": "2026-08-20", "source": "a wire",
+             "statement": "something was said", "provenance": {"url": "https://example.invalid/a"}}
+    other = dict(event, id="two", statement="something else was said")
+    published_news = news([event])
+    news_cases = [
+        ("news re-read of the same pool", news([event]), "none"),
+        ("news event added", news([event, other]), "minor"),
+        ("news event withdrawn", news([]), "major"),
+        ("news statement restated",
+         news([dict(event, statement="something was said, restated")]), "patch"),
+    ]
+
     for name, candidate, expected in cases:
         got = compute(base, candidate, rule)
         assert got == expected, f"{name}: expected {expected}, got {got}"
@@ -186,7 +327,16 @@ def selfcheck():
         got = compute(august, candidate, fx_rule)
         assert got == expected, f"{name}: expected {expected}, got {got}"
         print(f"ok  {name} -> {expected}")
-    print(f"ok  bump.py selfcheck: {len(cases) + len(fx_cases)} cases")
+    for name, candidate, expected in mm_cases:
+        got = compute(published_mm, candidate, mm_rule)
+        assert got == expected, f"{name}: expected {expected}, got {got}"
+        print(f"ok  {name} -> {expected}")
+    for name, candidate, expected in news_cases:
+        got = compute(published_news, candidate, news_rule)
+        assert got == expected, f"{name}: expected {expected}, got {got}"
+        print(f"ok  {name} -> {expected}")
+    total = len(cases) + len(fx_cases) + len(mm_cases) + len(news_cases)
+    print(f"ok  bump.py selfcheck: {total} cases")
 
 
 def main(argv):

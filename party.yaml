@@ -33,6 +33,23 @@ publishes:
     path: fx
     payload_schema: fx/payload.schema.json
     revoked: []
+  # The prediction-market series (ticket 49, ADR-0023 D2). ONE mechanical rule
+  # over ONE venue, publishing a dated SERIES and no probability-shaped field.
+  # A move is derived by the consumer (the twin), never asserted here, and a
+  # human-run skill is what classifies one. This feed prices nothing.
+  - kind: feed
+    name: market-moves
+    path: market-moves
+    payload_schema: market-moves/payload.schema.json
+    revoked: []
+  # Dated statements with the place each was read (ticket 50). The feed asserts
+  # only that something was said, when, and where; every judgement about it is a
+  # grade-5 claim on the twin side. This feed prices nothing.
+  - kind: feed
+    name: news
+    path: news
+    payload_schema: news/payload.schema.json
+    revoked: []
 overlay:
   add: []
   restate: []

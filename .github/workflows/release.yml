@@ -67,6 +67,13 @@ jobs:
           PLATFORM_DIR: .platform
         run: ./verify-feeds.sh
 
+      # tickets 49 and 50: the series, the thresholds, the observation lane, the
+      # absence of niobium and the absence of a model on the clock. Offline, so a
+      # skip here would be a fault too. verify-news-headline-skill.sh is NOT run:
+      # it reads the skill in the hub checkout and would exit 3 on a runner.
+      - name: offline verify -- market-moves and news
+        run: ./verify-market-and-news.sh
+
       - name: gitsign verify-tag, identity-pinned, offline Rekor bundle
         env:
           GITSIGN_REKOR_MODE: offline

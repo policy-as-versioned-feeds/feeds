@@ -1,0 +1,5 @@
+# The bump declared for this feed's next release (ticket 04 answer point 3;
+# ADR-0019). The scheduled fetch rewrites this line in the PR it opens: patch
+# for a threshold move in the series, minor for a change to rule.yaml, major
+# for a change to payload.schema.json. "none" means nothing is queued.
+bump: none
