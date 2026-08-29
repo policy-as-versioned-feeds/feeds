@@ -1,0 +1,66 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://policy-as-versioned.dev/schema/feeds/news.json",
+  "title": "news payload",
+  "description": "Dated statements, each with the place it was read. The MINIMAL payload ticket 23 decided: id, date, source, statement, provenance.url and nothing else. There is no steep tag, no severity, no relevance, no subject and no component here, because every one of those is a judgement, and a judgement in this estate is a skill a human runs over the pool (the classify-and-judge skill) whose output is a grade-5 claim on the twin side, contestable and never a published fact. The entry map is `events`, a list keyed by `id`.",
+  "type": "object",
+  "required": ["source", "events"],
+  "additionalProperties": false,
+  "properties": {
+    "source": {
+      "type": "string",
+      "minLength": 1,
+      "description": "The pool this feed reads, verbatim."
+    },
+    "note": { "type": "string", "minLength": 1 },
+    "events": {
+      "type": "array",
+      "minItems": 1,
+      "description": "The admitted events. A list, not a map: an event is a dated line in a log, not a slot somebody overwrites. bump.py keys it by `id`.",
+      "items": {
+        "type": "object",
+        "required": ["id", "date", "source", "statement", "provenance"],
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z0-9][a-z0-9-]*$",
+            "description": "Stable across republishes: a claim on the twin side names this id as the signal it bound."
+          },
+          "date": {
+            "type": "string",
+            "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$",
+            "description": "The date the thing was said, not the date it was read."
+          },
+          "source": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Who said it, as they are named at the URL."
+          },
+          "statement": {
+            "type": "string",
+            "minLength": 1,
+            "description": "What was said, in the plainest terms that stay true to the source. Not a summary of what it means."
+          },
+          "provenance": {
+            "type": "object",
+            "required": ["url"],
+            "additionalProperties": false,
+            "properties": {
+              "url": {
+                "type": "string",
+                "pattern": "^https?://",
+                "description": "Where it was read. REQUIRED (ticket 23 answer point 2): an entry nobody can go and check is not an observation, and an invented headline has no URL, which is the mechanism that keeps a scenario out of this feed."
+              },
+              "retrieved": {
+                "type": "string",
+                "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$",
+                "description": "The date the URL was read, where that differs from the event date."
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

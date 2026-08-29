@@ -1,0 +1,29 @@
+# What "changed" means for the news feed, and what may enter it at all
+# (ecosystem tickets 23 and 50, ADR-0023 decision D2).
+#
+# THE FEED CARRIES OBSERVED ENTRIES ONLY. An entry asserts three things and no
+# more: that something was said, when, and where it was read. Every judgement
+# about what it MEANS is a skill output on the twin side, grade 5 and
+# contestable -- never a field here.
+#
+# ADMISSION, applied by fetch/news.py, mechanically:
+#   requires_provenance_url  an event with no resolvable provenance URL is not
+#                            admitted. This is why an invented headline cannot
+#                            enter: a scenario has nowhere it was read. The
+#                            niobium supply shock is a SCENARIO and lives in the
+#                            adopter's twin scenario library (ticket 29), not
+#                            here -- verify-market-and-news.sh observes that.
+#   max_age_days             an event older than this window is not news.
+#
+# CHANGE: a newly admitted event is a MINOR (additive, every pin still
+# resolves); a withdrawn event is a MAJOR; a restated statement is a PATCH.
+# Nothing here moves numerically, so numeric_tolerance is 0 and unused.
+#
+# Flat key: value only -- bump.py parses this with the standard library, no
+# pyyaml on the runner.
+changed_when: "an admitted event that is not already published, or a published event withdrawn or restated"
+entries: events
+numeric_tolerance: 0
+requires_provenance_url: true
+max_age_days: 365
+rule_version: 1

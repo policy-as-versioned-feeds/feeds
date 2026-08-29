@@ -1,0 +1,42 @@
+{
+  "kind": "feed",
+  "name": "news",
+  "version": "1.0.0",
+  "published_by": "feeds",
+  "published_at": "2026-08-28T03:17:00+00:00",
+  "payload_schema": "news/payload.schema.json",
+  "payload": {
+    "source": "Publisher release records in the policy-as-versioned organisations",
+    "note": "Four dated statements, each read off a public release record in this estate's own organisations, so every entry here is checkable by opening its URL. That is the whole assertion this feed makes: something was said, on that date, and it was read there. What any of it MEANS for an organisation -- which component it touches, whether it moves an evolution position, whether it prices -- is a claim the classify-and-judge skill produces with a human at the keyboard, lands as a reviewed PR on that adopter's overlay, and is never a field in this payload.",
+    "events": [
+      {
+        "id": "ico-penalty-schema-1-0-0-tagged",
+        "date": "2026-08-21",
+        "source": "policy-as-versioned-ico",
+        "statement": "ico published the signed tag v1.0.0 of its penalty schema.",
+        "provenance": { "url": "https://github.com/policy-as-versioned-ico/ico/releases/tag/v1.0.0" }
+      },
+      {
+        "id": "platform-policy-3-0-0-tagged",
+        "date": "2026-08-23",
+        "source": "policy-as-versioned-platform",
+        "statement": "platform published the signed tag policy/v3.0.0, described by its own release commit as a major repair release.",
+        "provenance": { "url": "https://github.com/policy-as-versioned-platform/platform/releases/tag/policy%2Fv3.0.0" }
+      },
+      {
+        "id": "nist-controls-1-1-0-tagged",
+        "date": "2026-08-25",
+        "source": "policy-as-versioned-nist",
+        "statement": "nist published the signed tag v1.1.0 of its controls catalogue.",
+        "provenance": { "url": "https://github.com/policy-as-versioned-nist/nist/releases/tag/v1.1.0" }
+      },
+      {
+        "id": "platform-implementations-1-1-1-tagged",
+        "date": "2026-08-25",
+        "source": "policy-as-versioned-platform",
+        "statement": "platform published the signed tag v1.1.1 of its implementations package, carrying release-gate evidence for policy/v3.0.0.",
+        "provenance": { "url": "https://github.com/policy-as-versioned-platform/platform/releases/tag/v1.1.1" }
+      }
+    ]
+  }
+}
