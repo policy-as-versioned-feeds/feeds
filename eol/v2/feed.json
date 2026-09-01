@@ -1,13 +1,13 @@
 {
   "kind": "feed",
   "name": "eol",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "published_by": "feeds",
-  "published_at": "2026-07-31T16:22:39+01:00",
+  "published_at": "2026-09-01T08:38:17+00:00",
   "payload_schema": "eol/payload.schema.json",
   "payload": {
     "feed_version": "v2",
-    "published_by": "feeds",
+    "published_by": "platform",
     "changelog": "v2: added kyverno-1.10 (eol 2024-08-01, endoflife.date/kyverno) -- a component the platform now runs that endoflife.date started tracking; no other entries changed.",
     "note": "endoflife.date-style feed: component -> eol date + a base unpatched-CVE annual rate at end of support. Consumed as a *time-varying* risk: to_fair_scenario.py ramps loss-event-frequency by how far `--as-of` sits past eol_date, so a policy version going unmaintained is priced like any other EOL risk, not a bespoke sunset.",
     "components": {
