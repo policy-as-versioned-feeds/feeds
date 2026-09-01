@@ -1,30 +1,30 @@
 {
   "kind": "feed",
   "name": "fx",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "published_by": "feeds",
-  "published_at": "2026-07-31T09:00:00+01:00",
+  "published_at": "2026-09-01T08:38:31+00:00",
   "payload_schema": "fx/payload.schema.json",
   "payload": {
     "source": "HMRC monthly exchange rates",
-    "period": "2026-08",
+    "period": "2026-09",
     "base": "GBP",
-    "note": "Units of foreign currency per GBP 1, the shape HMRC publishes for customs and VAT at https://www.gov.uk/government/collections/exchange-rates-for-customs-and-vat -- one file per month, published at the end of the preceding month and fixed for the whole of that month. A price with an as_of date outside `period` has no rate here and refuses as a missing instrument (ADR-0020). These rates are ILLUSTRATIVE, in HMRC's published shape and magnitude: 2026-08 is not a month HMRC has published, and nothing here is a fetch of HMRC's file. Every other feed in this estate marks its provenance the same way.",
+    "note": "Units of foreign currency per GBP 1, the shape HMRC publishes for customs and VAT at https://www.gov.uk/government/collections/exchange-rates-for-customs-and-vat -- one file per month, published at the end of the preceding month and fixed for the whole of that month. A price with an as_of date outside `period` has no rate here and refuses as a missing instrument (ADR-0020).",
     "rates": {
-      "USD": 1.284,
-      "EUR": 1.1735,
-      "CHF": 1.091,
-      "JPY": 191.42,
-      "AUD": 1.936,
-      "CAD": 1.742,
-      "SEK": 12.43,
-      "NOK": 13.68,
-      "DKK": 8.752,
-      "PLN": 5.014,
-      "INR": 110.85,
-      "SGD": 1.689,
-      "ZAR": 22.73,
-      "NZD": 2.115
+      "USD": 1.2915,
+      "EUR": 1.1698,
+      "CHF": 1.0874,
+      "JPY": 190.06,
+      "AUD": 1.9412,
+      "CAD": 1.7495,
+      "SEK": 12.372,
+      "NOK": 13.741,
+      "DKK": 8.7245,
+      "PLN": 5.0328,
+      "INR": 111.42,
+      "SGD": 1.6851,
+      "ZAR": 22.918,
+      "NZD": 2.1067
     }
   }
 }
