@@ -190,3 +190,5 @@ jobs:
             -c user.email="feeds-bot@${GITHUB_REPOSITORY_OWNER}.invalid" \
             commit -S -m "observe ${{ matrix.feed }}: no change above threshold"
           git push origin observations
+
+# registered 2026-09-01: this line exists so a push touches the workflow file (ecosystem ticket 57)
