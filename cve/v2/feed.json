@@ -1,13 +1,13 @@
 {
   "kind": "feed",
   "name": "cve",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "published_by": "feeds",
-  "published_at": "2026-07-31T16:22:39+01:00",
+  "published_at": "2026-09-01T08:38:08+00:00",
   "payload_schema": "cve/payload.schema.json",
   "payload": {
     "feed_version": "v2",
-    "published_by": "feeds",
+    "published_by": "platform",
     "changelog": "v2: added CVE-2024-8888-istiod (critical, epss 0.55) -- a new critical istiod RCE landed in the upstream trivy DB scan; no other entries changed.",
     "note": "trivy/GHSA-style CVE feed for images the estate runs. Shape mirrors `trivy image --format json` + GHSA severity, trimmed to what fair.py needs: cvss score -> loss-magnitude band, epss (exploit-probability proxy) -> loss-event-frequency band. lm bands are editorial CVSS->impact-\u00a3 tiers (not a real breach-cost dataset), consistent across the feed.",
     "severity_lm_gbp": {
