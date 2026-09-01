@@ -49,6 +49,17 @@ jobs:
         with:
           fetch-depth: 0
 
+      # verify-feeds.sh needs the envelope schema, which lives in the platform
+      # repo (ADR-0019). It looks for an adjacent checkout at .platform when
+      # PLATFORM_DIR is unset. Pinned to the newest signed platform tag; found
+      # missing on this workflow's first-ever run (ecosystem ticket 57).
+      - name: checkout platform (envelope schema for the release gate)
+        uses: actions/checkout@v4
+        with:
+          repository: policy-as-versioned-platform/platform
+          ref: v2.0.1
+          path: .platform
+
       - name: install pinned gitsign (binary + checksum, no marketplace action)
         run: |
           set -euo pipefail
