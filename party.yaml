@@ -1,3 +1,4 @@
+# A demonstration party, not affiliated with, endorsed by or speaking for any real authority it names.
 # The party artefact for `feeds` (ADR-0019 point 5: discovery is publishes[]
 # on the publisher's own party artefact, and the set of signed publisher
 # artefacts IS the catalogue -- there is no central one). Validated against
