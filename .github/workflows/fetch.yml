@@ -40,6 +40,12 @@ permissions:
 # are the only paths any scheduled job in this repository may ever commit.
 env:
   OBSERVATION_LANE: "talk/truth.log drift/samples.jsonl talk/captures observations"
+  # Belt as well as braces (ticket 85, 2026-09-04). The clean below removes the .pyc files this
+  # clock's own python writes; this stops them being written at all. Two mechanisms, because the
+  # failure they prevent is silent -- a cage that refuses its own bytecode looks exactly like a
+  # cage refusing a real declaration, and it cost this repository every observation it ever tried
+  # to record.
+  PYTHONDONTWRITEBYTECODE: "1"
   GITSIGN_VERSION: 0.17.1
   GITSIGN_SHA256: 69213a8a0813a151e5a47d0060862952ff833a845d57309dff76f7ba6600abae
 
@@ -117,7 +123,17 @@ jobs:
           # onto the observations branch (ADR-0024, D1). The reading has already
           # been captured into ${RUNNER_TEMP}/obs above.
           git checkout -- . >/dev/null 2>&1 || true
-          git clean -fd -e .git >/dev/null 2>&1 || true
+          # `-ffdx`, not `-fd` (eco-system ticket 85, 2026-09-04). Without -x this clean left
+          # exactly the files .gitignore hides, and the biggest of those is the `fetch/__pycache__`
+          # that the `python3 fetch/<feed>.py` step above writes when it imports fetch/lib.py.
+          # They are invisible on `main`, where .gitignore covers them -- and the next two lines
+          # switch to the orphan `observations` branch, which has no .gitignore at all. The cage
+          # step below then read them as untracked files outside the observation lane and failed
+          # the run, every run, for five of the six declared feeds: threat-register, cve, eol, fx
+          # and news have never recorded a single observation. Same flags and the same reason as
+          # the `git clean -ffdx -e .git` on the orphan path a dozen lines down, so there is one
+          # clean in this file and not two spellings of it.
+          git clean -ffdx -e .git >/dev/null 2>&1 || true
           if git ls-remote --exit-code --heads origin observations >/dev/null 2>&1; then
             git fetch origin observations:observations
             git checkout observations
