@@ -1,5 +1,7 @@
 # policy-as-versioned-feeds / feeds
 
+**Licence:** [Apache-2.0](LICENSE) · *A demonstration party, not affiliated with, endorsed by or speaking for any real authority it names.*
+
 **The publisher of the estate's reactive feeds** — the institution threat
 register, a trivy/GHSA-shaped CVE feed, an `endoflife.date`-shaped EOL feed,
 `fx`, the HMRC monthly exchange rates every cross-currency price is restated
