@@ -1,1 +1,2 @@
 {"bump": "patch", "feed": "threat-register", "observed_at": "2026-09-05T07:39:31+00:00", "payload_sha256": "7c933a2e5cf6b7a18ab2664e1643df7487731808e1015140c4e3741905720bb4", "published_version": "2.0.0"}
+{"bump": "patch", "feed": "threat-register", "observed_at": "2026-09-06T07:53:28+00:00", "payload_sha256": "7c933a2e5cf6b7a18ab2664e1643df7487731808e1015140c4e3741905720bb4", "published_version": "2.0.0"}
