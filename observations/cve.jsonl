@@ -1,1 +1,2 @@
 {"bump": "patch", "feed": "cve", "observed_at": "2026-09-05T07:39:42+00:00", "payload_sha256": "c410fb298bfb43264d402bdf5b129c3377be816572067dd3ea7eda950c918d54", "published_version": "2.0.0"}
+{"bump": "patch", "feed": "cve", "observed_at": "2026-09-06T07:53:39+00:00", "payload_sha256": "c410fb298bfb43264d402bdf5b129c3377be816572067dd3ea7eda950c918d54", "published_version": "2.0.0"}
