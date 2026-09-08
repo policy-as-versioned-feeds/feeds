@@ -8,6 +8,7 @@
   "payload": {
     "feed_version": "v1",
     "published_by": "feeds",
+    "currency": "GBP",
     "note": "endoflife.date-style feed: component -> eol date + a base unpatched-CVE annual rate at end of support. Consumed as a *time-varying* risk: to_fair_scenario.py ramps loss-event-frequency by how far `--as-of` sits past eol_date, so a policy version going unmaintained is priced like any other EOL risk, not a bespoke sunset.",
     "components": {
       "python-3.9": {

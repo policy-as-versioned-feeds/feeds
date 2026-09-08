@@ -8,6 +8,7 @@
   "payload": {
     "feed_version": "v1",
     "published_by": "feeds",
+    "currency": "GBP",
     "note": "trivy/GHSA-style CVE feed for images the estate runs. Shape mirrors `trivy image --format json` + GHSA severity, trimmed to what fair.py needs: cvss score -> loss-magnitude band, epss (exploit-probability proxy) -> loss-event-frequency band. lm bands are editorial CVSS->impact-\u00a3 tiers (not a real breach-cost dataset), consistent across the feed.",
     "severity_lm_gbp": {
       "critical": [
