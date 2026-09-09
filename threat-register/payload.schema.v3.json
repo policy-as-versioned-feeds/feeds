@@ -1,0 +1,163 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://policy-as-versioned.dev/schema/feeds/threat-register.json",
+  "title": "threat-register payload, major 3",
+  "description": "Institution -> headline threat -> annual loss-event-frequency band AND the loss magnitude that goes with it. Major 3 (eco-system ticket 79 item 4) moves `lm_gbp` -- the impact per loss event -- out of the SUBSCRIBER's converter and into this, the PUBLISHER's own payload. Until major 3 the magnitudes lived in an adopter-keyed table inside platform/feeds/to_fair_scenario.py, so the platform held a number about each institution that no publisher had signed and no subscriber could re-derive. Each magnitude carries `lm_basis`, the same shape ico's penalty schema uses: a kind, a statement, a date it was read, and -- where the number is not counted -- what would make it counted. NOTE ON THE FILE NAME: majors 1 and 2 validate against payload.schema.json and are published, so repointing them would be an unreleased edit to a published major. From major 3 on, every major's schema is payload.schema.vN.json.",
+  "type": "object",
+  "required": [
+    "feed_version",
+    "published_by",
+    "currency",
+    "note",
+    "institutions"
+  ],
+  "properties": {
+    "feed_version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "published_by": {
+      "type": "string",
+      "minLength": 1
+    },
+    "currency": {
+      "type": "string",
+      "pattern": "^[A-Z]{3}$",
+      "description": "ISO 4217 code the loss magnitudes in this register are stated in. REQUIRED: a subscriber reading a magnitude with no declared currency would have to assume its own, which mints a currency instead of converting one (ADR-0020). Composition refuses a feed that declares none."
+    },
+    "note": {
+      "type": "string",
+      "minLength": 1
+    },
+    "changelog": {
+      "type": "string"
+    },
+    "institutions": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": [
+          "threat",
+          "flavour",
+          "lef",
+          "source",
+          "lm_gbp",
+          "lm_basis"
+        ],
+        "properties": {
+          "threat": {
+            "type": "string",
+            "minLength": 1
+          },
+          "flavour": {
+            "type": "string",
+            "minLength": 1
+          },
+          "lef": {
+            "type": "array",
+            "minItems": 3,
+            "maxItems": 3,
+            "items": {
+              "type": "number"
+            },
+            "description": "min, most-likely, max annual loss events."
+          },
+          "source": {
+            "type": "string",
+            "minLength": 1
+          },
+          "lm_gbp": {
+            "type": "array",
+            "minItems": 3,
+            "maxItems": 3,
+            "items": {
+              "type": "number",
+              "minimum": 0
+            },
+            "description": "min, most-likely, max IMPACT per loss event, in this payload's declared `currency`. lo <= mode <= hi."
+          },
+          "lm_basis": {
+            "type": "object",
+            "description": "What the magnitude rests on. A number the publisher signs and cannot say the source of is a missing instrument (ADR-0020), never a cheaper one.",
+            "required": [
+              "kind",
+              "statement",
+              "as_of"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "kind": {
+                "type": "string",
+                "enum": [
+                  "counted",
+                  "published",
+                  "editorial"
+                ]
+              },
+              "statement": {
+                "type": "string",
+                "minLength": 1
+              },
+              "as_of": {
+                "type": "string",
+                "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+              },
+              "source": {
+                "type": "string",
+                "minLength": 1
+              },
+              "url": {
+                "type": "string",
+                "minLength": 1
+              },
+              "could_not_look": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          },
+          "lef_basis": {
+            "type": "object",
+            "description": "What the magnitude rests on. A number the publisher signs and cannot say the source of is a missing instrument (ADR-0020), never a cheaper one.",
+            "required": [
+              "kind",
+              "statement",
+              "as_of"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "kind": {
+                "type": "string",
+                "enum": [
+                  "counted",
+                  "published",
+                  "editorial"
+                ]
+              },
+              "statement": {
+                "type": "string",
+                "minLength": 1
+              },
+              "as_of": {
+                "type": "string",
+                "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+              },
+              "source": {
+                "type": "string",
+                "minLength": 1
+              },
+              "url": {
+                "type": "string",
+                "minLength": 1
+              },
+              "could_not_look": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

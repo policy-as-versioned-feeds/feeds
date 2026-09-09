@@ -1,0 +1,104 @@
+{
+  "kind": "feed",
+  "name": "threat-register",
+  "version": "3.0.0",
+  "published_by": "feeds",
+  "published_at": "2026-09-09T12:00:00+01:00",
+  "payload_schema": "threat-register/payload.schema.v3.json",
+  "payload": {
+    "feed_version": "v3",
+    "published_by": "feeds",
+    "currency": "GBP",
+    "changelog": "v3 (eco-system ticket 79 item 4): `lm_gbp` and `lm_basis` per institution. The loss magnitudes were an adopter-keyed table inside platform/feeds/to_fair_scenario.py -- the SUBSCRIBER's code holding a signed-looking number about each institution that no publisher had published and no subscriber could re-derive. They move here unchanged, so the move itself moves no price, and each carries a dated basis and a could-not-look. `lef_basis` gives the frequency the same shape. The converter that reads them moves with them, to threat-register/to_fair_scenario.py in this repository: from major 3 the publisher ships both the number and the code that turns it into a scenario. payload_schema change, so a major (ADR-0019).",
+    "note": "institution threat register -- annual loss-event-frequency (lef) AND impact per event (lm_gbp) per institution's headline threat, each with its own basis. Editorial and grounded in publicly reported incident base rates (Verizon DBIR sector breach-frequency ranges), not a live threat-intel subscription.",
+    "institutions": {
+      "driftwood": {
+        "threat": "cart/checkout PII exfiltration",
+        "flavour": "e-commerce, short-life cart data, high traffic/low sensitivity per-record",
+        "lef": [
+          2,
+          4,
+          9
+        ],
+        "source": "DBIR retail-sector web-app-attack base rate, editorial midpoint",
+        "lm_gbp": [
+          1000,
+          4000,
+          9000
+        ],
+        "lm_basis": {
+          "kind": "editorial",
+          "as_of": "2026-09-09",
+          "statement": "Impact per cart/checkout PII exfiltration event for a mid-market UK e-commerce institution: short-life cart data, high traffic, low sensitivity per record.",
+          "source": "moved unchanged from platform/feeds/to_fair_scenario.py THREAT_LM_GBP, which held it as an adopter-keyed table in the subscriber's own code (eco-system ticket 79 item 4)",
+          "could_not_look": "no run of this estate has counted per-event losses for any institution in this register, and none of the three publishes one. These are the publisher's editorial bands, moved here from platform/feeds/to_fair_scenario.py's THREAT_LM_GBP unchanged so that the move itself moves no price. What would close it: a per-sector per-event loss figure with a published source and a date, or an institution's own signed incident cost."
+        },
+        "lef_basis": {
+          "kind": "editorial",
+          "as_of": "2026-09-09",
+          "statement": "Annual loss-event frequency for this institution's headline threat. DBIR retail-sector web-app-attack base rate, editorial midpoint",
+          "source": "DBIR retail-sector web-app-attack base rate, editorial midpoint",
+          "could_not_look": "the DBIR publishes sector breach-frequency ranges, not a rate for one named institution, and no run of this estate has counted events for these three. Editorial midpoints, labelled as such."
+        }
+      },
+      "tuppence": {
+        "threat": "payment-fraud / account-takeover via API abuse",
+        "flavour": "fintech, FCA/PCI, availability+fraud flavour",
+        "lef": [
+          4,
+          9,
+          20
+        ],
+        "source": "DBIR financial-sector base rate + 2026 UK fintech ATO-uptick roundup, editorial midpoint",
+        "lm_gbp": [
+          5000,
+          25000,
+          90000
+        ],
+        "lm_basis": {
+          "kind": "editorial",
+          "as_of": "2026-09-09",
+          "statement": "Impact per payment-fraud / account-takeover event for a UK fintech: direct fraud loss plus reimbursement, higher per event than retail PII and far below a health record.",
+          "source": "moved unchanged from platform/feeds/to_fair_scenario.py THREAT_LM_GBP, which held it as an adopter-keyed table in the subscriber's own code (eco-system ticket 79 item 4)",
+          "could_not_look": "no run of this estate has counted per-event losses for any institution in this register, and none of the three publishes one. These are the publisher's editorial bands, moved here from platform/feeds/to_fair_scenario.py's THREAT_LM_GBP unchanged so that the move itself moves no price. What would close it: a per-sector per-event loss figure with a published source and a date, or an institution's own signed incident cost."
+        },
+        "lef_basis": {
+          "kind": "editorial",
+          "as_of": "2026-09-09",
+          "statement": "Annual loss-event frequency for this institution's headline threat. DBIR financial-sector base rate + 2026 UK fintech ATO-uptick roundup, editorial midpoint",
+          "source": "DBIR financial-sector base rate + 2026 UK fintech ATO-uptick roundup, editorial midpoint",
+          "could_not_look": "the DBIR publishes sector breach-frequency ranges, not a rate for one named institution, and no run of this estate has counted events for these three. Editorial midpoints, labelled as such."
+        }
+      },
+      "ludlow": {
+        "threat": "confidential health-record exfiltration",
+        "flavour": "HIPAA, decades-confidential, HNDL/harvest-now-decrypt-later exposure",
+        "lef": [
+          1,
+          2,
+          5
+        ],
+        "source": "DBIR healthcare-sector base rate, editorial midpoint -- lower frequency, far higher confidentiality horizon",
+        "lm_gbp": [
+          20000,
+          100000,
+          400000
+        ],
+        "lm_basis": {
+          "kind": "editorial",
+          "as_of": "2026-09-09",
+          "statement": "Impact per confidential health-record exfiltration event: decades-confidential data with a harvest-now-decrypt-later horizon, the highest per-event band in this register.",
+          "source": "moved unchanged from platform/feeds/to_fair_scenario.py THREAT_LM_GBP, which held it as an adopter-keyed table in the subscriber's own code (eco-system ticket 79 item 4)",
+          "could_not_look": "no run of this estate has counted per-event losses for any institution in this register, and none of the three publishes one. These are the publisher's editorial bands, moved here from platform/feeds/to_fair_scenario.py's THREAT_LM_GBP unchanged so that the move itself moves no price. What would close it: a per-sector per-event loss figure with a published source and a date, or an institution's own signed incident cost."
+        },
+        "lef_basis": {
+          "kind": "editorial",
+          "as_of": "2026-09-09",
+          "statement": "Annual loss-event frequency for this institution's headline threat. DBIR healthcare-sector base rate, editorial midpoint -- lower frequency, far higher confidentiality horizon",
+          "source": "DBIR healthcare-sector base rate, editorial midpoint -- lower frequency, far higher confidentiality horizon",
+          "could_not_look": "the DBIR publishes sector breach-frequency ranges, not a rate for one named institution, and no run of this estate has counted events for these three. Editorial midpoints, labelled as such."
+        }
+      }
+    }
+  }
+}
