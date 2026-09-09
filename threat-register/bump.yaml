@@ -2,4 +2,15 @@
 # ADR-0019). The scheduled fetch rewrites this line in the PR it opens; a
 # human reviews it against what bump.py computed. "none" means nothing is
 # queued for release.
-bump: none
+#
+# SET TO `major` 2026-09-09 (eco-system ticket 79 item 4). threat-register/v3/
+# is in the tree and untagged: the queued release is v3.0.0 and it is a major,
+# because the payload schema changed -- `lm_gbp` and `lm_basis` per institution,
+# and `lef_basis` beside them (ADR-0019).
+#
+# THE CUT IS NOT DONE HERE. cut-release.yml is dispatched by the owner and it is
+# the owner who signs threat-register/v3.0.0. Nothing re-prices before that tag:
+# driftwood pins v2 and tuppence and ludlow pin v1, and all three keep pricing
+# the same magnitudes either way, because major 3's numbers ARE the numbers the
+# platform's own table held.
+bump: major

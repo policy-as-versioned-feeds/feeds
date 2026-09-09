@@ -5,6 +5,6 @@
 #
 # Flat key: value only -- bump.py parses this with the standard library, no
 # pyyaml on the runner.
-changed_when: "any institution added or removed, or any lef number moves by more than 10%"
+changed_when: "any institution added or removed, any lef or lm_gbp number moves by more than 10%, or any basis changes"
 entries: institutions
 numeric_tolerance: 0.10

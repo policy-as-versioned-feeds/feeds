@@ -286,5 +286,81 @@ case "$refusal" in
 esac
 
 echo
-echo "PASS: every published feed is one envelope validated against platform/feeds/schema.json and its own payload schema; rule.yaml and bump.yaml sit beside each feed; the bump ladder holds; publishes[] names only real paths; a twin scenario validates against the 2.0.0 forward-intel payload schema; fx prices a date it publishes and refuses one it does not."
+# --- the threat register's magnitudes and its own converter (eco-system ticket 79 item 4) ---
+echo
+echo "== the threat register publishes its own magnitudes, and ships the converter that reads them =="
+if ! python3 threat-register/to_fair_scenario.py selfcheck; then
+  echo "FAIL: threat-register/to_fair_scenario.py selfcheck failed -- the publisher's own converter"
+  exit 1
+fi
+python3 - <<'TR79'
+import glob, json, re, sys
+
+DATE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
+KINDS = ("counted", "published", "editorial")
+bad = []
+
+
+def grade(basis, who, number):
+    if not isinstance(basis, dict):
+        bad.append(f"{who} publishes {number} with no basis -- a bare number. Its basis belongs "
+                    f"beside it in the payload (eco-system ticket 79 item 4)")
+        return
+    for key in ("kind", "statement", "as_of"):
+        if not basis.get(key):
+            bad.append(f"{who} publishes {number} with a basis carrying no {key!r}")
+    if basis.get("kind") not in KINDS:
+        bad.append(f"{who}: basis kind {basis.get('kind')!r} is not one of {list(KINDS)}")
+    elif basis["kind"] != "counted" and not basis.get("could_not_look"):
+        bad.append(f"{who}: basis kind is {basis['kind']!r} and names no `could_not_look` "
+                    f"saying what would make it counted")
+    if basis.get("as_of") and not DATE.match(basis["as_of"]):
+        bad.append(f"{who}: basis as_of {basis['as_of']!r} is not a date -- a disclosed limit "
+                    f"is a printed number or a date")
+
+
+graded = 0
+for path in sorted(glob.glob("threat-register/v*/feed.json")):
+    env = json.load(open(path))
+    major = int(env["version"].split(".")[0])
+    payload = env["payload"]
+    for name, entry in payload["institutions"].items():
+        who = f"{path} institutions.{name}"
+        if major < 3:
+            # Published before the field existed. Graded for what it DOES carry;
+            # its magnitude is named as unsourced on every scenario it prices.
+            if "lm_gbp" in entry:
+                bad.append(f"{who} carries lm_gbp on a major that predates the field")
+            continue
+        if "lm_gbp" not in entry:
+            bad.append(f"{who} publishes no `lm_gbp`, so the impact per loss event stays in the "
+                        f"SUBSCRIBER's own code where no publisher signed it (eco-system "
+                        f"ticket 79 item 4)")
+            continue
+        lm = entry["lm_gbp"]
+        if not (isinstance(lm, list) and len(lm) == 3 and lm[0] <= lm[1] <= lm[2]):
+            bad.append(f"{who}: lm_gbp is {lm!r}, not a lo<=mode<=hi triple")
+        grade(entry.get("lm_basis"), who, f"a magnitude of {tuple(lm)} {payload['currency']}")
+        grade(entry.get("lef_basis"), who, f"a frequency of {tuple(entry['lef'])} events/yr")
+        graded += 1
+        print(f"ok  {who}: lm {tuple(lm)} {payload['currency']}, lef {tuple(entry['lef'])}, "
+              f"both with a dated basis")
+
+if graded < 3:
+    bad.append(f"only {graded} institution(s) graded for a published magnitude; major 3 carries "
+                f"more than that")
+if bad:
+    for b in bad:
+        print("FAIL: " + b)
+    sys.exit(1)
+print(f"ok  {graded} institution(s) in major 3 and above publish their own loss magnitude, each "
+      f"with a basis carrying a kind, a statement and a date")
+TR79
+if [ $? -ne 0 ]; then
+  echo "FAIL: a published threat-register magnitude or frequency carries no basis"
+  exit 1
+fi
+
+
+echo "PASS: every published feed is one envelope validated against platform/feeds/schema.json and its own payload schema; rule.yaml and bump.yaml sit beside each feed; the bump ladder holds; publishes[] names only real paths; a twin scenario validates against the 2.0.0 forward-intel payload schema; fx prices a date it publishes and refuses one it does not; and the threat register publishes its own loss magnitudes with a dated basis on each and ships the converter that reads them."
 exit 0
