@@ -13,4 +13,7 @@
 # driftwood pins v2 and tuppence and ludlow pin v1, and all three keep pricing
 # the same magnitudes either way, because major 3's numbers ARE the numbers the
 # platform's own table held.
-bump: major
+# RESET TO `none` 2026-09-10: threat-register/v3.0.0 is tagged, signed and
+# published, so nothing is queued, which is what `none` means above. The prose
+# is kept rather than deleted, because it records what v3.0.0 was and why.
+bump: none
