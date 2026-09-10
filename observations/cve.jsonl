@@ -3,3 +3,4 @@
 {"bump": "patch", "feed": "cve", "observed_at": "2026-09-07T08:16:57+00:00", "payload_sha256": "c410fb298bfb43264d402bdf5b129c3377be816572067dd3ea7eda950c918d54", "published_version": "2.0.0"}
 {"bump": "patch", "feed": "cve", "observed_at": "2026-09-08T08:03:55+00:00", "payload_sha256": "c410fb298bfb43264d402bdf5b129c3377be816572067dd3ea7eda950c918d54", "published_version": "2.0.0"}
 {"bump": "patch", "feed": "cve", "observed_at": "2026-09-09T08:07:51+00:00", "payload_sha256": "879649c5c608fe18508c8409fd5fd03b16874a79aa725bad09ba01f8c2001611", "published_version": "2.0.0"}
+{"bump": "patch", "feed": "cve", "observed_at": "2026-09-10T08:07:33+00:00", "payload_sha256": "879649c5c608fe18508c8409fd5fd03b16874a79aa725bad09ba01f8c2001611", "published_version": "2.0.0"}
