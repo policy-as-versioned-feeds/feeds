@@ -13,4 +13,4 @@
 # driftwood pins v2 and tuppence and ludlow pin v1, and all three keep pricing
 # the same magnitudes either way, because major 3's numbers ARE the numbers the
 # platform's own table held.
-bump: major
+bump: patch
