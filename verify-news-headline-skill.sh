@@ -23,6 +23,12 @@
 # Gate contract: exit 0 observed true, exit 3 could not look (last line
 # SKIP: ...), anything else observed false (last line FAIL: ...).
 set -uo pipefail
+# The worked claim file is a human's run of a skill no clock may run. The hub's
+# twin/model_permission.py derive_clock() lets a GitHub Actions marker overrule the
+# declared clock, so on the hub's truth clock the runner's own markers would grade
+# this human example as a governed GitHub run. The hub's
+# verify/model-permission/verify-model-permission.sh grades the GitHub path itself.
+unset GITHUB_ACTIONS GITHUB_RUN_ID GITHUB_WORKFLOW
 here="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$here"
 
