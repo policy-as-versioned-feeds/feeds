@@ -345,6 +345,37 @@ for path in sorted(glob.glob("threat-register/v*/feed.json")):
         graded += 1
         print(f"ok  {who}: lm {tuple(lm)} {payload['currency']}, lef {tuple(entry['lef'])}, "
               f"both with a dated basis")
+        if major < 4:
+            if "threats" in entry:
+                bad.append(f"{who} carries a threats map on a major that predates the field")
+            continue
+        # Major 4 (eco-system ticket 145, ADR-0031): the `threats` map, and the one
+        # row the platform's twin-agent cage price reads. Its frequency is graded
+        # like the headline's; a `published` basis must say where (url); and the
+        # magnitude is the row's own or, by name, the subscriber's -- never neither.
+        rows = entry.get("threats")
+        if not isinstance(rows, dict) or "scheduled-agent-misuses-write-credential" not in rows:
+            bad.append(f"{who} publishes no threats.scheduled-agent-misuses-write-credential row, "
+                        f"so the twin agent's cage has no frequency to price on (ticket 145)")
+            continue
+        for rid, row in rows.items():
+            rwho = f"{who}.threats.{rid}"
+            lef = row.get("lef")
+            if not (isinstance(lef, list) and len(lef) == 3 and lef[0] <= lef[1] <= lef[2]):
+                bad.append(f"{rwho}: lef is {lef!r}, not a lo<=mode<=hi triple")
+            grade(row.get("lef_basis"), rwho, f"a frequency of {tuple(lef or ())} events/yr")
+            if (row.get("lef_basis") or {}).get("kind") == "published" and not (row.get("lef_basis") or {}).get("url"):
+                bad.append(f"{rwho}: a `published` frequency names no url to the work it rests on")
+            if "lm_gbp" in row:
+                grade(row.get("lm_basis"), rwho, f"a magnitude of {tuple(row['lm_gbp'])}")
+            elif not isinstance(row.get("magnitude_basis"), dict) or \
+                    (row["magnitude_basis"].get("kind") != "subscriber") or \
+                    not row["magnitude_basis"].get("statement") or not DATE.match(row["magnitude_basis"].get("as_of") or ""):
+                bad.append(f"{rwho}: publishes no lm_gbp and no dated magnitude_basis naming the "
+                            f"subscriber as the magnitude's owner -- a row with neither prices nothing")
+            print(f"ok  {rwho}: lef {tuple(lef or ())} events/yr with a "
+                  f"{(row.get('lef_basis') or {}).get('kind')} basis; magnitude "
+                  f"{'published' if 'lm_gbp' in row else (row.get('magnitude_basis') or {}).get('kind')}")
 
 if graded < 3:
     bad.append(f"only {graded} institution(s) graded for a published magnitude; major 3 carries "
