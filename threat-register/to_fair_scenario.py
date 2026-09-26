@@ -84,7 +84,57 @@ def _basis_note(basis, what: str, where: str) -> str:
     return note
 
 
-def threat_scenario(feed: dict, institution: str) -> dict:
+def _threat_row_scenario(feed: dict, institution: str, entry: dict, threat: str,
+                         lm, where: str) -> dict:
+    """A row of the institution's `threats` map (payload major 4, eco-system
+    ticket 145): a frequency the register publishes, with a magnitude that is
+    either the row's own (`lm_gbp`) or the SUBSCRIBER's, handed in by the caller
+    and named as such on the scenario. A row with neither refuses by name."""
+    version = feed.get("feed_version", "unversioned")
+    rows = entry.get("threats") or {}
+    if threat not in rows:
+        sys.exit(f"{where}: payload version {version} publishes no threats.{threat!r} row (it "
+                 f"carries {sorted(rows)}). The row arrives with major 4 (eco-system ticket 145); "
+                 f"there is nothing here to price from (ADR-0020)")
+    row = rows[threat]
+    where = f"{where}.threats.{threat}"
+    lef = _triple(row["lef"], "lef", where)
+    notes = [f"{row['threat']}."]
+    if row.get("actor"):
+        notes.append(str(row["actor"]))
+    notes.append(_basis_note(row.get("lef_basis"), "Frequency", where))
+    if "lm_gbp" in row:
+        magnitude = "publisher"
+        lm = _triple(row["lm_gbp"], "lm_gbp", where)
+        notes.append(_basis_note(row.get("lm_basis"), "Magnitude", where))
+    elif lm is not None:
+        magnitude = "subscriber"
+        lm = _triple(lm, "lm", "the caller's magnitude")
+        basis = row.get("magnitude_basis") or {}
+        notes.append(f"Magnitude: the subscriber's own ({basis.get('kind', 'unstated')}, read "
+                     f"{basis.get('as_of', 'undated')}): "
+                     f"{basis.get('statement', 'the register publishes none and says nothing about whose it is')}")
+    else:
+        basis = row.get("magnitude_basis") or {}
+        sys.exit(f"{where}: publishes no `lm_gbp` and the caller supplied no magnitude. Its "
+                 f"magnitude_basis says whose it is ({basis.get('kind', 'unstated')}: "
+                 f"{basis.get('statement', 'no statement')}); there is nothing to annualise "
+                 f"(ADR-0020)")
+    return {
+        "version": version,
+        "name": f"threat-register:{version} {institution} {threat}",
+        "threat": threat,
+        "magnitude": magnitude,
+        "note": " ".join(notes),
+        "warn": {"lef": list(lef), "lm": list(lm)},
+        "deny": {"lef": list(DENY_LEF), "lm": list(lm)},
+    }
+
+
+def threat_scenario(feed: dict, institution: str, threat: str | None = None, lm=None) -> dict:
+    """One institution's HEADLINE threat as a fair.py scenario, or, with `threat`,
+    one row of its `threats` map (major 4). `lm` is the caller's own magnitude
+    for a row that publishes none; it is ignored for the headline."""
     version = feed.get("feed_version", "unversioned")
     currency = feed.get("currency") or "GBP"
     institutions = feed.get("institutions") or {}
@@ -93,6 +143,8 @@ def threat_scenario(feed: dict, institution: str) -> dict:
                  f"(it carries {sorted(institutions)})")
     entry = institutions[institution]
     where = f"threat-register {version}: institutions.{institution}"
+    if threat is not None:
+        return _threat_row_scenario(feed, institution, entry, threat, lm, where)
 
     lef = _triple(entry["lef"], "lef", where)
     notes = [f"{entry['threat']} ({entry['flavour']})."]
@@ -187,6 +239,50 @@ def selfcheck() -> None:
     print("ok  the converter imports only the standard library, so the hub's portability replay "
           "can run it in a directory holding nothing but itself and the payload")
 
+    # Major 4 (eco-system ticket 145): the `threats` map. Every institution's
+    # `scheduled-agent-misuses-write-credential` row prices with a magnitude the
+    # CALLER hands in and names it as the subscriber's; with none it refuses by
+    # name; an unknown row refuses by name; and a pre-major-4 payload refuses the
+    # row naming the major it arrives with. The headline scenario of every
+    # major-4 institution is byte-identical to major 3's, so the move re-prices
+    # no headline.
+    v4_path = os.path.join(root, "v4", "feed.json")
+    assert os.path.exists(v4_path), "major 4 is in the tree"
+    v4 = json.load(open(v4_path))["payload"]
+    row_id = "scheduled-agent-misuses-write-credential"
+    priced = 0
+    for inst in v4["institutions"]:
+        assert row_id in (v4["institutions"][inst].get("threats") or {}), (inst, "carries the row")
+        sc = threat_scenario(v4, inst, threat=row_id, lm=(10.0, 10.0, 10.0))
+        assert sc["magnitude"] == "subscriber" and sc["threat"] == row_id, sc
+        assert sc["warn"]["lm"] == [10.0, 10.0, 10.0] and sc["warn"]["lef"][0] <= sc["warn"]["lef"][1] <= sc["warn"]["lef"][2], sc
+        assert 0 < sc["warn"]["lef"][1] < 0.01, ("a per-year rate well under one event", sc["warn"]["lef"])
+        assert "Frequency basis (published" in sc["note"] and "the subscriber's own" in sc["note"], sc["note"]
+        assert "COULD NOT LOOK" in sc["note"], "the row names what it could not look at"
+        assert threat_scenario(v4, inst)["warn"] == threat_scenario(v3, inst)["warn"], (inst, "headline unchanged")
+        priced += 1
+        for bad, why in ((lambda: threat_scenario(v4, inst, threat=row_id), "no magnitude at all"),
+                         (lambda: threat_scenario(v4, inst, threat="no-such-row", lm=(1, 1, 1)), "unknown row"),
+                         (lambda: threat_scenario(v3, inst, threat=row_id, lm=(1, 1, 1)), "pre-major-4 payload")):
+            try:
+                bad()
+            except SystemExit as e:
+                assert row_id in str(e) or "no-such-row" in str(e), (why, e)
+                assert "ADR-0020" in str(e), (why, e)
+            else:
+                raise AssertionError(f"{why} priced instead of refusing")
+    assert priced == 3, priced
+    print(f"ok  major 4: {priced} institutions carry the `{row_id}` row; each prices only with the "
+          f"subscriber's own magnitude and says so, refuses with none, and every headline scenario is "
+          f"major 3's")
+
+
+def _lm_arg(text: str):
+    parts = [float(x) for x in text.split(",")]
+    if len(parts) != 3:
+        sys.exit(f"--lm wants lo,mode,hi, got {text!r}")
+    return parts
+
 
 def main(argv=None) -> None:
     p = argparse.ArgumentParser(description=__doc__.splitlines()[0])
@@ -194,6 +290,10 @@ def main(argv=None) -> None:
     pt = sub.add_parser("threat", help="one institution's entry -> a fair.py scenario")
     pt.add_argument("feed", help="path to the threat-register PAYLOAD (envelope or bare payload)")
     pt.add_argument("institution")
+    pt.add_argument("--threat", default=None,
+                    help="a row of the institution's `threats` map (major 4) instead of the headline")
+    pt.add_argument("--lm", default=None, type=_lm_arg,
+                    help="lo,mode,hi: the SUBSCRIBER's own magnitude for a row that publishes none")
     pt.add_argument("-o", "--out")
     sub.add_parser("selfcheck", help="every published (version, institution) yields a valid scenario")
 
@@ -204,7 +304,7 @@ def main(argv=None) -> None:
 
     doc = json.load(open(args.feed))
     feed = doc.get("payload", doc) if isinstance(doc, dict) else doc
-    scenario = threat_scenario(feed, args.institution)
+    scenario = threat_scenario(feed, args.institution, threat=args.threat, lm=args.lm)
     out = json.dumps(scenario, indent=2)
     if args.out:
         open(args.out, "w").write(out + "\n")
