@@ -1,8 +1,9 @@
 {
-  "feed_version": "v2",
-  "published_by": "platform",
-  "changelog": "v2: tuppence lef raised 3,6,14 -> 4,9,20 -- reflects the 2026 uptick in API-based account-takeover fraud reported across UK fintechs (industry roundup, not a driftwood-specific incident). Other institutions unchanged.",
-  "note": "institution threat register -- annual loss-event-frequency (lef) per institution's headline threat, editorial and grounded in publicly reported incident base rates (Verizon DBIR sector breach-frequency ranges), not a live threat-intel subscription.",
+  "feed_version": "v4",
+  "published_by": "feeds",
+  "currency": "GBP",
+  "changelog": "v4 (eco-system ticket 145, ADR-0031): a `threats` map beside each institution's headline threat, for threats the register prices a frequency for without a magnitude of its own. The one row it carries is `scheduled-agent-misuses-write-credential`, the frequency the platform's twin-agent cage price reads (ticket 30 decisions 12 and 15): N x C / M, one marketplace action per served sweep times the published 2025 compromise count over the marketplace population, grade 3, cited in the row with what it could not look at. The headline threat, its lef, lm_gbp and both bases are unchanged from v3, so the move changes no headline price. payload_schema change, so a major (ADR-0019).",
+  "note": "institution threat register -- annual loss-event-frequency (lef) AND impact per event (lm_gbp) per institution's headline threat, each with its own basis. Editorial and grounded in publicly reported incident base rates (Verizon DBIR sector breach-frequency ranges), not a live threat-intel subscription. From v4 each institution also carries a `threats` map: a frequency row per named threat, with its basis, and the magnitude's basis where the register publishes none.",
   "institutions": {
     "driftwood": {
       "threat": "cart/checkout PII exfiltration",
@@ -12,7 +13,51 @@
         4,
         9
       ],
-      "source": "DBIR retail-sector web-app-attack base rate, editorial midpoint"
+      "source": "DBIR retail-sector web-app-attack base rate, editorial midpoint",
+      "lm_gbp": [
+        1000,
+        4000,
+        9000
+      ],
+      "lm_basis": {
+        "kind": "editorial",
+        "as_of": "2026-09-09",
+        "statement": "Impact per cart/checkout PII exfiltration event for a mid-market UK e-commerce institution: short-life cart data, high traffic, low sensitivity per record.",
+        "source": "moved unchanged from platform/feeds/to_fair_scenario.py THREAT_LM_GBP, which held it as an adopter-keyed table in the subscriber's own code (eco-system ticket 79 item 4)",
+        "could_not_look": "no run of this estate has counted per-event losses for any institution in this register, and none of the three publishes one. These are the publisher's editorial bands, moved here from platform/feeds/to_fair_scenario.py's THREAT_LM_GBP unchanged so that the move itself moves no price. What would close it: a per-sector per-event loss figure with a published source and a date, or an institution's own signed incident cost."
+      },
+      "lef_basis": {
+        "kind": "editorial",
+        "as_of": "2026-09-09",
+        "statement": "Annual loss-event frequency for this institution's headline threat. DBIR retail-sector web-app-attack base rate, editorial midpoint",
+        "source": "DBIR retail-sector web-app-attack base rate, editorial midpoint",
+        "could_not_look": "the DBIR publishes sector breach-frequency ranges, not a rate for one named institution, and no run of this estate has counted events for these three. Editorial midpoints, labelled as such."
+      },
+      "threats": {
+        "scheduled-agent-misuses-write-credential": {
+          "threat": "a scheduled agent misuses its write credential",
+          "actor": "driftwood's twin agent: every act of its twin with nobody at the keyboard, on the scheduled twin sweep and on the owner's local clock (ADR-0031 decision 1). The served sweep, .github/workflows/twin-sweep.yml at driftwood origin/main 155db9e read on 2026-09-26, holds contents: write and references one distinct marketplace action by floating tag, actions/checkout@v4.",
+          "lef": [
+            8.4186e-05,
+            8.4186e-05,
+            0.00029465
+          ],
+          "source": "N x C / M: N = 1 marketplace action the served sweep runs by floating tag; C = 2 (min, mode) to 7 (max) marketplace actions with a published compromise in 2025; M = 23,757 marketplace actions (Chaiwut and Nikiforakis, 'Time for Actions: A Longitudinal Study of the GitHub Actions Marketplace', IEEE SecDev 2025)",
+          "lef_basis": {
+            "kind": "published",
+            "as_of": "2026-09-26",
+            "statement": "Annual frequency with which a marketplace action this institution's scheduled twin sweep runs by floating tag is compromised at that tag, taken as the frequency the sweep's write credential is misused. N x C / M with N = 1 (actions/checkout@v4, the one distinct marketplace action the served twin-sweep.yml references, read at driftwood origin/main 155db9e on 2026-09-26); C = 2 for the min and the mode (the marketplace actions CISA's alert of 2025-03-18 names as compromised in 2025: tj-actions/changed-files, CVE-2025-30066, used in over 23,000 repositories per StepSecurity's 2025-03-14 report, and reviewdog/action-setup, CVE-2025-30154) and 7 for the max (those two plus the five downstream reviewdog actions Wiz named on 2025-03-17 as compromised through action-setup: action-shellcheck, action-composite-template, action-staticcheck, action-ast-grep, action-typos); M = 23,757 marketplace actions counted over four months by Chaiwut and Nikiforakis (IEEE SecDev 2025). 8.42e-05 to 0.000295 events a year. Grade 3 on the estate's evidence ladder: published work, not observed here.",
+            "source": "CISA, 'Supply Chain Compromise of Third-Party tj-actions/changed-files (CVE-2025-30066) and reviewdog/action-setup@v1 (CVE-2025-30154)', 2025-03-18; Wiz, 'New GitHub Action supply chain attack: reviewdog/action-setup', 2025-03-17; StepSecurity, 'Harden-Runner detection: tj-actions/changed-files action is compromised', 2025-03-14; Chaiwut and Nikiforakis, 'Time for Actions', IEEE SecDev 2025, 23,757 marketplace actions",
+            "url": "https://www.cisa.gov/news-events/alerts/2025/03/18/supply-chain-compromise-third-party-tj-actionschanged-files-cve-2025-30066-and-reviewdogaction",
+            "could_not_look": "No publisher counts credential MISUSE after a compromise, so this rate counts every published compromise of a floating-tag marketplace action as a misuse of the sweep's token: an upper bound for that door, and the only door with a published count. Not in the rate: the hub checkout at `main` and `pip install pyyaml`, dependencies the served sweep runs unpinned today (eco-system ticket 143 pins both by hash, and hash-pinning closes the floating-tag door this rate counts); a maintainer's own compromised account pushing a workflow (GhostAction, GitGuardian, 2025-09-05: 327 users, 817 repositories, 3,325 secrets), which is a human credential, not the scheduled agent's; and a pwn request on the repository's own workflow (the Nx s1ngularity entry point, 2025-08-26). The count is one year's (2025): no second year is counted, so the min and mode are the two actions with a CVE and the max the seven Wiz names. No run of this estate has observed a misuse. What would close it: an institution's own dated incident record (grade 2), or a published per-repository annual rate of CI credential misuse."
+          },
+          "magnitude_basis": {
+            "kind": "subscriber",
+            "as_of": "2026-09-26",
+            "statement": "This register publishes no loss magnitude for this row. The magnitude is the subscriber's own (eco-system ticket 30 decision 12): the gap between its residual at the loosest rung and at its selected rung, read off its own composed `source: twin` line, over the window until the hub's gate detects the act. platform/compose/composition.py derives it; platform/graded/cage.py names the window and its source."
+          }
+        }
+      }
     },
     "tuppence": {
       "threat": "payment-fraud / account-takeover via API abuse",
@@ -22,7 +67,51 @@
         9,
         20
       ],
-      "source": "DBIR financial-sector base rate + 2026 UK fintech ATO-uptick roundup, editorial midpoint"
+      "source": "DBIR financial-sector base rate + 2026 UK fintech ATO-uptick roundup, editorial midpoint",
+      "lm_gbp": [
+        5000,
+        25000,
+        90000
+      ],
+      "lm_basis": {
+        "kind": "editorial",
+        "as_of": "2026-09-09",
+        "statement": "Impact per payment-fraud / account-takeover event for a UK fintech: direct fraud loss plus reimbursement, higher per event than retail PII and far below a health record.",
+        "source": "moved unchanged from platform/feeds/to_fair_scenario.py THREAT_LM_GBP, which held it as an adopter-keyed table in the subscriber's own code (eco-system ticket 79 item 4)",
+        "could_not_look": "no run of this estate has counted per-event losses for any institution in this register, and none of the three publishes one. These are the publisher's editorial bands, moved here from platform/feeds/to_fair_scenario.py's THREAT_LM_GBP unchanged so that the move itself moves no price. What would close it: a per-sector per-event loss figure with a published source and a date, or an institution's own signed incident cost."
+      },
+      "lef_basis": {
+        "kind": "editorial",
+        "as_of": "2026-09-09",
+        "statement": "Annual loss-event frequency for this institution's headline threat. DBIR financial-sector base rate + 2026 UK fintech ATO-uptick roundup, editorial midpoint",
+        "source": "DBIR financial-sector base rate + 2026 UK fintech ATO-uptick roundup, editorial midpoint",
+        "could_not_look": "the DBIR publishes sector breach-frequency ranges, not a rate for one named institution, and no run of this estate has counted events for these three. Editorial midpoints, labelled as such."
+      },
+      "threats": {
+        "scheduled-agent-misuses-write-credential": {
+          "threat": "a scheduled agent misuses its write credential",
+          "actor": "tuppence's twin agent: every act of its twin with nobody at the keyboard, on the scheduled twin sweep and on the owner's local clock (ADR-0031 decision 1). The served sweep, .github/workflows/twin-sweep.yml at tuppence origin/main 5deffe6 read on 2026-09-26, holds contents: write and references one distinct marketplace action by floating tag, actions/checkout@v4.",
+          "lef": [
+            8.4186e-05,
+            8.4186e-05,
+            0.00029465
+          ],
+          "source": "N x C / M: N = 1 marketplace action the served sweep runs by floating tag; C = 2 (min, mode) to 7 (max) marketplace actions with a published compromise in 2025; M = 23,757 marketplace actions (Chaiwut and Nikiforakis, 'Time for Actions: A Longitudinal Study of the GitHub Actions Marketplace', IEEE SecDev 2025)",
+          "lef_basis": {
+            "kind": "published",
+            "as_of": "2026-09-26",
+            "statement": "Annual frequency with which a marketplace action this institution's scheduled twin sweep runs by floating tag is compromised at that tag, taken as the frequency the sweep's write credential is misused. N x C / M with N = 1 (actions/checkout@v4, the one distinct marketplace action the served twin-sweep.yml references, read at tuppence origin/main 5deffe6 on 2026-09-26); C = 2 for the min and the mode (the marketplace actions CISA's alert of 2025-03-18 names as compromised in 2025: tj-actions/changed-files, CVE-2025-30066, used in over 23,000 repositories per StepSecurity's 2025-03-14 report, and reviewdog/action-setup, CVE-2025-30154) and 7 for the max (those two plus the five downstream reviewdog actions Wiz named on 2025-03-17 as compromised through action-setup: action-shellcheck, action-composite-template, action-staticcheck, action-ast-grep, action-typos); M = 23,757 marketplace actions counted over four months by Chaiwut and Nikiforakis (IEEE SecDev 2025). 8.42e-05 to 0.000295 events a year. Grade 3 on the estate's evidence ladder: published work, not observed here.",
+            "source": "CISA, 'Supply Chain Compromise of Third-Party tj-actions/changed-files (CVE-2025-30066) and reviewdog/action-setup@v1 (CVE-2025-30154)', 2025-03-18; Wiz, 'New GitHub Action supply chain attack: reviewdog/action-setup', 2025-03-17; StepSecurity, 'Harden-Runner detection: tj-actions/changed-files action is compromised', 2025-03-14; Chaiwut and Nikiforakis, 'Time for Actions', IEEE SecDev 2025, 23,757 marketplace actions",
+            "url": "https://www.cisa.gov/news-events/alerts/2025/03/18/supply-chain-compromise-third-party-tj-actionschanged-files-cve-2025-30066-and-reviewdogaction",
+            "could_not_look": "No publisher counts credential MISUSE after a compromise, so this rate counts every published compromise of a floating-tag marketplace action as a misuse of the sweep's token: an upper bound for that door, and the only door with a published count. Not in the rate: the hub checkout at `main` and `pip install pyyaml`, dependencies the served sweep runs unpinned today (eco-system ticket 143 pins both by hash, and hash-pinning closes the floating-tag door this rate counts); a maintainer's own compromised account pushing a workflow (GhostAction, GitGuardian, 2025-09-05: 327 users, 817 repositories, 3,325 secrets), which is a human credential, not the scheduled agent's; and a pwn request on the repository's own workflow (the Nx s1ngularity entry point, 2025-08-26). The count is one year's (2025): no second year is counted, so the min and mode are the two actions with a CVE and the max the seven Wiz names. No run of this estate has observed a misuse. What would close it: an institution's own dated incident record (grade 2), or a published per-repository annual rate of CI credential misuse."
+          },
+          "magnitude_basis": {
+            "kind": "subscriber",
+            "as_of": "2026-09-26",
+            "statement": "This register publishes no loss magnitude for this row. The magnitude is the subscriber's own (eco-system ticket 30 decision 12): the gap between its residual at the loosest rung and at its selected rung, read off its own composed `source: twin` line, over the window until the hub's gate detects the act. platform/compose/composition.py derives it; platform/graded/cage.py names the window and its source."
+          }
+        }
+      }
     },
     "ludlow": {
       "threat": "confidential health-record exfiltration",
@@ -32,7 +121,51 @@
         2,
         5
       ],
-      "source": "DBIR healthcare-sector base rate, editorial midpoint -- lower frequency, far higher confidentiality horizon"
+      "source": "DBIR healthcare-sector base rate, editorial midpoint -- lower frequency, far higher confidentiality horizon",
+      "lm_gbp": [
+        20000,
+        100000,
+        400000
+      ],
+      "lm_basis": {
+        "kind": "editorial",
+        "as_of": "2026-09-09",
+        "statement": "Impact per confidential health-record exfiltration event: decades-confidential data with a harvest-now-decrypt-later horizon, the highest per-event band in this register.",
+        "source": "moved unchanged from platform/feeds/to_fair_scenario.py THREAT_LM_GBP, which held it as an adopter-keyed table in the subscriber's own code (eco-system ticket 79 item 4)",
+        "could_not_look": "no run of this estate has counted per-event losses for any institution in this register, and none of the three publishes one. These are the publisher's editorial bands, moved here from platform/feeds/to_fair_scenario.py's THREAT_LM_GBP unchanged so that the move itself moves no price. What would close it: a per-sector per-event loss figure with a published source and a date, or an institution's own signed incident cost."
+      },
+      "lef_basis": {
+        "kind": "editorial",
+        "as_of": "2026-09-09",
+        "statement": "Annual loss-event frequency for this institution's headline threat. DBIR healthcare-sector base rate, editorial midpoint -- lower frequency, far higher confidentiality horizon",
+        "source": "DBIR healthcare-sector base rate, editorial midpoint -- lower frequency, far higher confidentiality horizon",
+        "could_not_look": "the DBIR publishes sector breach-frequency ranges, not a rate for one named institution, and no run of this estate has counted events for these three. Editorial midpoints, labelled as such."
+      },
+      "threats": {
+        "scheduled-agent-misuses-write-credential": {
+          "threat": "a scheduled agent misuses its write credential",
+          "actor": "ludlow's twin agent: every act of its twin with nobody at the keyboard, on the scheduled twin sweep and on the owner's local clock (ADR-0031 decision 1). The served sweep, .github/workflows/twin-sweep.yml at ludlow origin/main b8e14f7 read on 2026-09-26, holds contents: write and references one distinct marketplace action by floating tag, actions/checkout@v4.",
+          "lef": [
+            8.4186e-05,
+            8.4186e-05,
+            0.00029465
+          ],
+          "source": "N x C / M: N = 1 marketplace action the served sweep runs by floating tag; C = 2 (min, mode) to 7 (max) marketplace actions with a published compromise in 2025; M = 23,757 marketplace actions (Chaiwut and Nikiforakis, 'Time for Actions: A Longitudinal Study of the GitHub Actions Marketplace', IEEE SecDev 2025)",
+          "lef_basis": {
+            "kind": "published",
+            "as_of": "2026-09-26",
+            "statement": "Annual frequency with which a marketplace action this institution's scheduled twin sweep runs by floating tag is compromised at that tag, taken as the frequency the sweep's write credential is misused. N x C / M with N = 1 (actions/checkout@v4, the one distinct marketplace action the served twin-sweep.yml references, read at ludlow origin/main b8e14f7 on 2026-09-26); C = 2 for the min and the mode (the marketplace actions CISA's alert of 2025-03-18 names as compromised in 2025: tj-actions/changed-files, CVE-2025-30066, used in over 23,000 repositories per StepSecurity's 2025-03-14 report, and reviewdog/action-setup, CVE-2025-30154) and 7 for the max (those two plus the five downstream reviewdog actions Wiz named on 2025-03-17 as compromised through action-setup: action-shellcheck, action-composite-template, action-staticcheck, action-ast-grep, action-typos); M = 23,757 marketplace actions counted over four months by Chaiwut and Nikiforakis (IEEE SecDev 2025). 8.42e-05 to 0.000295 events a year. Grade 3 on the estate's evidence ladder: published work, not observed here.",
+            "source": "CISA, 'Supply Chain Compromise of Third-Party tj-actions/changed-files (CVE-2025-30066) and reviewdog/action-setup@v1 (CVE-2025-30154)', 2025-03-18; Wiz, 'New GitHub Action supply chain attack: reviewdog/action-setup', 2025-03-17; StepSecurity, 'Harden-Runner detection: tj-actions/changed-files action is compromised', 2025-03-14; Chaiwut and Nikiforakis, 'Time for Actions', IEEE SecDev 2025, 23,757 marketplace actions",
+            "url": "https://www.cisa.gov/news-events/alerts/2025/03/18/supply-chain-compromise-third-party-tj-actionschanged-files-cve-2025-30066-and-reviewdogaction",
+            "could_not_look": "No publisher counts credential MISUSE after a compromise, so this rate counts every published compromise of a floating-tag marketplace action as a misuse of the sweep's token: an upper bound for that door, and the only door with a published count. Not in the rate: the hub checkout at `main` and `pip install pyyaml`, dependencies the served sweep runs unpinned today (eco-system ticket 143 pins both by hash, and hash-pinning closes the floating-tag door this rate counts); a maintainer's own compromised account pushing a workflow (GhostAction, GitGuardian, 2025-09-05: 327 users, 817 repositories, 3,325 secrets), which is a human credential, not the scheduled agent's; and a pwn request on the repository's own workflow (the Nx s1ngularity entry point, 2025-08-26). The count is one year's (2025): no second year is counted, so the min and mode are the two actions with a CVE and the max the seven Wiz names. No run of this estate has observed a misuse. What would close it: an institution's own dated incident record (grade 2), or a published per-repository annual rate of CI credential misuse."
+          },
+          "magnitude_basis": {
+            "kind": "subscriber",
+            "as_of": "2026-09-26",
+            "statement": "This register publishes no loss magnitude for this row. The magnitude is the subscriber's own (eco-system ticket 30 decision 12): the gap between its residual at the loosest rung and at its selected rung, read off its own composed `source: twin` line, over the window until the hub's gate detects the act. platform/compose/composition.py derives it; platform/graded/cage.py names the window and its source."
+          }
+        }
+      }
     }
   }
 }
