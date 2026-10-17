@@ -11,6 +11,8 @@
 #   4. every path party.yaml publishes exists, because publishes[] IS the
 #      catalogue (ADR-0019 point 5) and a catalogue entry pointing at nothing
 #      is a lie.
+#   5. the actual release signing caller requests embedded Rekor proof, tested
+#      with real Git and a refusing signer: no signature or tag is created.
 #
 # Gate contract: exit 0 observed true, exit 3 could not look (last line
 # SKIP: ...), anything else observed false (last line FAIL: ...).
@@ -31,6 +33,12 @@ if [ -z "$schema" ] || [ ! -f "$schema" ]; then
   echo "no platform checkout with feeds/schema.json next to this repo"
   echo "SKIP: cannot look -- the envelope schema lives at platform/feeds/schema.json (ADR-0019) and no platform checkout was found; set PLATFORM_DIR"
   exit 3
+fi
+
+echo "== release signing caller: embedded proof requested, signer refuses =="
+if ! python3 -B .github/tests/test_release_signing.py; then
+  echo "FAIL: the release signing caller does not request embedded Rekor proof"
+  exit 1
 fi
 
 echo "== envelope schema: $schema =="
