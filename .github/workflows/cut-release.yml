@@ -93,6 +93,25 @@ jobs:
       - name: offline verify -- market-moves and news
         run: ./verify-market-and-news.sh
 
+      - name: reproduce an explicitly enrolled native release cage before signing
+        env:
+          FEED_INPUT: ${{ inputs.feed }}
+          VERSION_INPUT: ${{ inputs.version }}
+        run: |
+          python3 - "${FEED_INPUT}" "${VERSION_INPUT}" <<'PYCODE'
+          import json, subprocess, sys
+          from pathlib import Path
+          feed, version = sys.argv[1:]
+          payload = json.loads(Path(f'{feed}/v{version.split(".")[0]}/feed.json').read_text())['payload']
+          if 'release_cage' in payload:
+              cage = payload['release_cage']
+              if not isinstance(cage, dict) or set(cage) != {'path', 'git_blob'}:
+                  raise SystemExit('FAIL: malformed opt-in release_cage')
+              command = [sys.executable, '.github/scripts/publisher-release-gate.py', 'verify', cage['path'], f'{feed}/v{version}']
+              raise SystemExit(subprocess.run(command).returncode)
+          print('OK: no opt-in release cage; existing offline release gates apply')
+          PYCODE
+
       - name: reject a tag that already exists (no force-move, ever)
         run: |
           set -euo pipefail

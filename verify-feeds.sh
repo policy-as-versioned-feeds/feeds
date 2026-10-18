@@ -297,6 +297,15 @@ echo
 # --- the threat register's magnitudes and its own converter (eco-system ticket 79 item 4) ---
 echo
 echo "== the threat register publishes its own magnitudes, and ships the converter that reads them =="
+if ! python3 .github/tests/test_publisher_release_gate.py; then
+  echo "FAIL: opt-in native release proof public CLI regression"
+  exit 1
+fi
+if ! python3 threat-register/test_widening_cli.py; then
+  echo "FAIL: publisher reliability converter CLI contract"
+  exit 1
+fi
+
 if ! python3 threat-register/to_fair_scenario.py selfcheck; then
   echo "FAIL: threat-register/to_fair_scenario.py selfcheck failed -- the publisher's own converter"
   exit 1
