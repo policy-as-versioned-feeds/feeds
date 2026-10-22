@@ -36,8 +36,10 @@ def fetch(url):
         try:
             with urllib.request.urlopen(urllib.request.Request(url, headers=headers), timeout=30) as response:
                 return response.read()
-        except urllib.error.HTTPError as exc:
-            if exc.code not in (429, 502, 503) or attempt == 3:
+        except (urllib.error.HTTPError, TimeoutError) as exc:
+            # A complete response read can time out after headers arrived.
+            # Share the existing bounded budget; never retry permanent HTTP errors.
+            if (isinstance(exc, urllib.error.HTTPError) and exc.code not in (429, 502, 503)) or attempt == 3:
                 raise
             time.sleep(min(2 ** attempt, 8))
     raise RuntimeError('source could not be read: ' + url)

@@ -35,6 +35,12 @@ if [ -z "$schema" ] || [ ! -f "$schema" ]; then
   exit 3
 fi
 
+echo "== CVE transport: bounded retries and permanent-failure refusal =="
+if ! python3 -B .github/tests/test_cve_fetch.py; then
+  echo "FAIL: the CVE transport retry or permanent-failure contract does not hold"
+  exit 1
+fi
+
 echo "== release signing caller: embedded proof requested, signer refuses =="
 if ! python3 -B .github/tests/test_release_signing.py; then
   echo "FAIL: the release signing caller does not request embedded Rekor proof"
