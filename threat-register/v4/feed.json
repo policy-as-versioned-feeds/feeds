@@ -1,7 +1,7 @@
 {
   "kind": "feed",
   "name": "threat-register",
-  "version": "4.0.0",
+  "version": "4.1.0",
   "published_by": "feeds",
   "published_at": "2026-09-26T12:00:00+01:00",
   "payload_schema": "threat-register/payload.schema.v4.json",
