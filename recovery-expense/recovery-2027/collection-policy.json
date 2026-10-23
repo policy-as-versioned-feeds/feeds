@@ -1,0 +1,24 @@
+{
+  "cost_centres": {
+    "driftwood": [
+      "driftwood/recovery-engineering-2027"
+    ],
+    "ludlow": [
+      "ludlow/recovery-engineering-2027"
+    ],
+    "tuppence": [
+      "tuppence/recovery-engineering-2027"
+    ]
+  },
+  "labour_rates_gbp_per_hour": {
+    "driftwood": "100",
+    "ludlow": "100",
+    "tuppence": "100"
+  },
+  "operator_control_disclosure": "All three institutional planning/accounting policies are prepared under one user-delegated operator and root review. The feeds publisher, platform resolver and nist scorer are different genuine canonical GitHub source identities, but organisational, operational and statistical independence is NOT established by their names/signatures. Shared operator/control and incident dependence must remain disclosed. Future expense worklogs/invoices, reconciliation and non-event/no-additional-expense attestations require real separately attributable source records and actual custodians; none is appointed or evidenced by this policy. Forecaster/scorer-generated evidence cannot replace independent outcomes.",
+  "schema": "recovery-expense/accounting-policy-v1",
+  "unit": {
+    "basis": "nominal direct security-incident recovery expense per registered subject-year",
+    "currency": "GBP"
+  }
+}
