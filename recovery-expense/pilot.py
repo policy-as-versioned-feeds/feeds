@@ -187,7 +187,8 @@ def check_bundle(root, nist_root=None):
     if not re.fullmatch(r'1\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)', envelope.get('version', '')):
         raise ValueError('bundle must carry the separate canonical major-1 envelope')
     jsonschema.Draft7Validator(json.loads((contract / 'envelope.schema.json').read_text())).validate(envelope)
-    if envelope['payload_schema'] != SCHEMA_PATH or envelope['name'] != 'recovery-expense' or envelope['published_by'] != 'feeds':
+    if (envelope['kind'] != 'feed' or envelope['payload_schema'] != SCHEMA_PATH
+            or envelope['name'] != 'recovery-expense' or envelope['published_by'] != 'feeds'):
         raise ValueError('bundle envelope target/schema mismatch')
     if root.joinpath('recovery-expense/to_fair_scenario.py').read_bytes() != (HERE / 'to_fair_scenario.py').read_bytes():
         raise ValueError('bundle converter is not the actual matching publisher source')
@@ -219,7 +220,8 @@ def check_bundle(root, nist_root=None):
         validator.validate(value)
     if profile['population']['case_inventory'] != {'path': CASES_PATH, 'git_blob': blob((root / CASES_PATH).read_bytes())}:
         raise ValueError('case inventory same-tree identity mismatch')
-    if profile['id'] != cases['profile_id'] or {x['subject'] for x in cases['cases']} != set(PARTIES) or len(cases['cases']) != 3:
+    if (profile['id'] != 'direct-security-recovery-2027' or profile['id'] != cases['profile_id']
+            or {x['subject'] for x in cases['cases']} != set(PARTIES) or len(cases['cases']) != 3):
         raise ValueError('the complete three-case population is required')
     upstream = json.loads((contract / 'PRICE-UPSTREAM.json').read_text())
     expected_engine = {'party': 'platform', 'tag': upstream['tag'], 'commit': upstream['commit'],
@@ -228,9 +230,11 @@ def check_bundle(root, nist_root=None):
         raise ValueError('profile does not name the existing SDK fixed released engine')
     if profile['target_feed'] != {'publisher': 'feeds', 'name': 'recovery-expense'} or profile['unit'] != {'currency': 'GBP', 'basis': BASIS}:
         raise ValueError('profile does not preserve the exact direct-recovery target/unit')
-    if profile['resolver_rule'] != {'party': 'platform', 'source_schema': 'recovery-expense/resolution-source-v1',
+    if (profile['resolver_rule'] != {'party': 'platform', 'source_schema': 'recovery-expense/resolution-source-v1',
             'amount_pointer': '/amount', 'finality_pointer': '/final', 'completeness_pointer': '/complete',
-            'evidence_uri_prefix': profile['resolver_rule']['evidence_uri_prefix']}:
+            'evidence_uri_prefix': profile['resolver_rule']['evidence_uri_prefix']}
+            or not profile['resolver_rule']['evidence_uri_prefix'].startswith(
+                'https://github.com/policy-as-versioned-platform/platform/')):
         raise ValueError('profile differs from the independent collector resolution interface')
     expected_definition = {'loss_categories': ACCOUNTING['included'],
         'accounting_rule': ACCOUNTING['allocation'] + ' Recognition: ' + ACCOUNTING['recognition'] + ' Excluded: ' + '; '.join(ACCOUNTING['excluded']) + ' Collection-policy-sha256=' + digest,

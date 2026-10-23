@@ -144,6 +144,37 @@ class RecoveryPilotTest(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'outcome accounting boundaries'):
             pilot.check_bundle(root)
 
+    def assert_checked_bundle_refuses(self, root, message):
+        with self.assertRaisesRegex(ValueError, message):
+            pilot.check_bundle(root)
+        call = subprocess.run([sys.executable, '-B', str(HERE / 'pilot.py'), 'check-bundle', str(root)],
+                              capture_output=True, text=True)
+        self.assertEqual(call.returncode, 1, call.stdout + call.stderr)
+        self.assertIn(message, call.stderr)
+
+    def test_check_bundle_rejects_non_feed_kind(self):
+        root = self.save_bundle(self.bundle()); path = root / 'recovery-expense/v1/feed.json'
+        envelope = json.loads(path.read_text()); envelope['kind'] = 'controls'
+        path.write_bytes(pilot.canonical(envelope))
+        self.assert_checked_bundle_refuses(root, 'bundle envelope target/schema mismatch')
+
+    def test_check_bundle_rejects_renamed_profile_with_recoupled_inventory(self):
+        root = self.save_bundle(self.bundle()); profile_path = root / pilot.PROFILE_PATH; cases_path = root / pilot.CASES_PATH
+        profile = json.loads(profile_path.read_text()); cases = json.loads(cases_path.read_text())
+        profile['id'] = cases['profile_id'] = 'synthetic-other-cohort'
+        raw = pilot.canonical(cases); cases_path.write_bytes(raw)
+        # Keep the same-tree inventory binding valid; mutual equality is not the fixed collector identity.
+        profile['population']['case_inventory']['git_blob'] = pilot.blob(raw)
+        profile_path.write_bytes(pilot.canonical(profile))
+        self.assert_checked_bundle_refuses(root, 'complete three-case population')
+
+    def test_check_bundle_rejects_noncanonical_resolver_evidence_prefix(self):
+        root = self.save_bundle(self.bundle()); path = root / pilot.PROFILE_PATH
+        profile = json.loads(path.read_text())
+        profile['resolver_rule']['evidence_uri_prefix'] = 'https://TEST-ONLY-unrelated.invalid/'
+        path.write_bytes(pilot.canonical(profile))
+        self.assert_checked_bundle_refuses(root, 'independent collector resolution interface')
+
     def test_nonfinite_boolean_or_unordered_model_parameters_refuse(self):
         for triple in [[False, 1, 2], [2, 1, 3], [0, 1, float('inf')]]:
             with self.subTest(triple=triple):
