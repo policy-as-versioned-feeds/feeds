@@ -1,0 +1,57 @@
+{
+  "criterion": "money-empirical-crps/v1",
+  "definition": {
+    "accounting_rule": "Allocate each independently evidenced source cost once across registered cost centres; disclose shared incidents and dependence. Recognition: Recognize eligible expense by incurred UTC date in the registered subject-year, not incident onset, payment or recording date. Annual frequency counts incidents with eligible recovery activity in that year, including carry-in; severity is only their eligible within-year incremental direct expense, excluding carry-out. Excluded: Routine controls and already-budgeted operating cost; Missed sales, fines, premiums, customer/patient losses; Double-counted shared incident costs, forecast-generated outcomes and synthetic tests Collection-policy-sha256=5d77ac2f15f4179f006cdb61deb2f75425325b6e1fb8169ce6bbe574c3d9e5c1",
+    "completeness_rule": "Complete cost-centre incident ledger plus attributable invoices/worklogs and an independent final completeness attestation; an empty log is not zero.",
+    "finality_rule": "Year-end independent reconciliation and signed final/complete record; unresolved or disputed amounts are ineligible. Closing within 31 days is a process target.",
+    "loss_categories": [
+      "Incremental incident-response and restoration labour at an agreed charge-out rule, supported by worklogs",
+      "Actual incremental restoration/vendor invoices allocated once to a registered cost centre"
+    ]
+  },
+  "generator": {
+    "engine": {
+      "commit": "5d45baa5923191dfd0e9cfb2cfaeae6906a41fce",
+      "git_blob": "1e73bd8f6603ff1798268206cd1bcc6f0842975b",
+      "party": "platform",
+      "path": "fair/fair.py",
+      "tag": "v5.4.0"
+    },
+    "kind": "pinned-fair-annual-empirical/v1",
+    "parameter_policy": "explicit-per-registration-recorded-not-inferred",
+    "state": "warn"
+  },
+  "horizon_rule": {
+    "boundary": "[start,end)",
+    "calendar": "UTC-Gregorian",
+    "duration": "P1Y"
+  },
+  "id": "direct-security-recovery-2027",
+  "outcome_kind": "annual-aggregate-loss/v1",
+  "population": {
+    "aggregation": "equal-case-mean",
+    "case_inventory": {
+      "git_blob": "d70a276a35ed4f5c7a1f6bd096cae1aea61322ca",
+      "path": "recovery-expense/recovery-2027/cases.json"
+    },
+    "overlap_rule": "distinct-case-subject-horizon-no-overlap",
+    "registration_deadline": "strictly-before-horizon-start"
+  },
+  "resolver_rule": {
+    "amount_pointer": "/amount",
+    "completeness_pointer": "/complete",
+    "evidence_uri_prefix": "https://github.com/policy-as-versioned-platform/platform/",
+    "finality_pointer": "/final",
+    "party": "platform",
+    "source_schema": "recovery-expense/resolution-source-v1"
+  },
+  "schema": "publisher-reliability/price-profile-v1",
+  "target_feed": {
+    "name": "recovery-expense",
+    "publisher": "feeds"
+  },
+  "unit": {
+    "basis": "nominal direct security-incident recovery expense per registered subject-year",
+    "currency": "GBP"
+  }
+}

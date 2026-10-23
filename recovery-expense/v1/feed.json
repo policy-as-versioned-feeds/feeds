@@ -107,7 +107,7 @@
     "scope": "shadow-collection-only"
   },
   "payload_schema": "recovery-expense/payload.schema.json",
-  "published_at": "2026-10-23T14:18:08Z",
+  "published_at": "2026-10-23T17:29:12Z",
   "published_by": "feeds",
-  "version": "1.0.0"
+  "version": "1.0.1"
 }
