@@ -1,0 +1,3 @@
+# No model artifact or release is queued. The private builder requires explicit parameters.
+# Initial 1.0.0 remains a separately reviewed bootstrap, never a computed comparison.
+bump: none

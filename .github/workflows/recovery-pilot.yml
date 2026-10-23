@@ -1,0 +1,22 @@
+name: prospective recovery pilot source
+on:
+  pull_request:
+    paths: ['recovery-expense/**', 'party.yaml', '.github/workflows/recovery-pilot.yml']
+  push:
+    paths: ['recovery-expense/**', 'party.yaml', '.github/workflows/recovery-pilot.yml']
+permissions:
+  contents: read
+jobs:
+  pure-contract-regressions:
+    runs-on: ubuntu-latest
+    env:
+      PYTHONDONTWRITEBYTECODE: '1'
+      GIT_OPTIONAL_LOCKS: '0'
+    steps:
+      - uses: actions/checkout@v4
+      - name: prepare isolated validation dependencies
+        run: |
+          python3 -m venv .recovery-test-env
+          .recovery-test-env/bin/python -m pip install -r recovery-expense/requirements.txt
+      - name: public converter and unsigned bundle contracts
+        run: .recovery-test-env/bin/python -B -m unittest discover -s recovery-expense -p test_pilot.py -v

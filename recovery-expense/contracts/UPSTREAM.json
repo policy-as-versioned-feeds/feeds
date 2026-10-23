@@ -1,0 +1,26 @@
+{
+  "repository": "https://github.com/policy-as-versioned-nist/nist",
+  "commit": "dc4c090f2b1388f18a4b7d6fbbf3e03c40dda795",
+  "tree": "38622b38ea649d3d5a6c320896ad598db8e7f150",
+  "files": [
+    {
+      "path": "publisher-reliability/price-payload.schema.json",
+      "vendored_path": "price-payload.schema.json",
+      "git_blob": "f3eeef9f9f4c329f06b5d7de0cae496a1dc98ec1",
+      "sha256": "afdc29ae800a690514bc4c204c1e17265fcf32ca434da84addfd712fb4c0b46e"
+    },
+    {
+      "path": "publisher-reliability/envelope.schema.json",
+      "vendored_path": "envelope.schema.json",
+      "git_blob": "25e3ce2531df916aee9c2bd4b2cb5cd084343931",
+      "sha256": "7be8052a5c20df24eb39ce01b9b754b769a1425f2097d6b372389be002e72b59"
+    },
+    {
+      "path": "publisher-reliability/PRICE-UPSTREAM.json",
+      "vendored_path": "PRICE-UPSTREAM.json",
+      "git_blob": "5f9a9167832592b30dd81ccd1186df0ac9b573ad",
+      "sha256": "5d14352f2aa68d782aa2efa69d069305492e3e370e00bb11ab297f29f7d823ff"
+    }
+  ],
+  "scope": "Unmodified source schema/engine descriptors only; no SDK implementation or admission/signature/engine bypass."
+}
