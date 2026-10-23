@@ -1,0 +1,57 @@
+{
+  "cases": [
+    {
+      "case_id": "driftwood/2027",
+      "context_ref": {
+        "commit": "6e421617a8d2c23c1107df69a43ac54197d2f27c",
+        "git_blob": "73141b54563168e1409fc9bf754d54d92f9e12bf",
+        "party": "driftwood",
+        "path": "party.yaml",
+        "tag": "v5.3.0"
+      },
+      "horizon": {
+        "boundary": "[start,end)",
+        "ends_at": "2028-01-01T00:00:00Z",
+        "starts_at": "2027-01-01T00:00:00Z"
+      },
+      "perspective": "driftwood",
+      "subject": "driftwood"
+    },
+    {
+      "case_id": "tuppence/2027",
+      "context_ref": {
+        "commit": "5c9f021c7c4eeaf545366f6c446f189eb07a131c",
+        "git_blob": "eb8f4bf6ef781f568c8311e642372669b7e05c21",
+        "party": "tuppence",
+        "path": "party.yaml",
+        "tag": "v4.4.0"
+      },
+      "horizon": {
+        "boundary": "[start,end)",
+        "ends_at": "2028-01-01T00:00:00Z",
+        "starts_at": "2027-01-01T00:00:00Z"
+      },
+      "perspective": "tuppence",
+      "subject": "tuppence"
+    },
+    {
+      "case_id": "ludlow/2027",
+      "context_ref": {
+        "commit": "951985a161a3da46c0aa9c2166f29c59710c31d5",
+        "git_blob": "3c840ae5ea1584077fa7ef2408c434d72a944a11",
+        "party": "ludlow",
+        "path": "party.yaml",
+        "tag": "v5.4.0"
+      },
+      "horizon": {
+        "boundary": "[start,end)",
+        "ends_at": "2028-01-01T00:00:00Z",
+        "starts_at": "2027-01-01T00:00:00Z"
+      },
+      "perspective": "ludlow",
+      "subject": "ludlow"
+    }
+  ],
+  "profile_id": "direct-security-recovery-2027",
+  "schema": "publisher-reliability/price-cases-v1"
+}
