@@ -30,4 +30,8 @@
 # the owner who signs threat-register/v4.0.0. Nothing re-prices before that tag:
 # driftwood pins v2 and tuppence and ludlow pin v1, and each adopter's twin-agent
 # line is a named could-not-look until its pin moves to v4.
-bump: major
+# DECLARED `minor` 2026-10-23: release the additive reviewed forecast-base /
+# widen-to converter ABI. The unchanged payload/schema computes `none` under
+# bump.py; this reviewed minor is deliberately stronger (ADR-0011), not an
+# automatically measured ABI bump. No financial input or enrollment changes.
+bump: minor
