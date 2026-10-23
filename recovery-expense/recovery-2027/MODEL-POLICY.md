@@ -1,0 +1,21 @@
+# Adopted prospective recovery-expense planning policy
+
+On 2026-10-23 the delegated institutional planning authority adopted the same initial policy for driftwood/2027, tuppence/2027 and ludlow/2027. These are explicit unvalidated normative choices for the separate shadow-only feeds/recovery-expense major 1 model, not measured incident rates, payroll, losses, effectiveness or calibration. They do not replace institutional threat/fine headlines or arise from summing the five overlapping workload contingencies.
+
+Each institution uses annual incident-frequency PERT `[0.25,1,3]` and within-year incremental recovery expense per incident PERT GBP `[1000,5000,20000]`. The frequency mode is a planning reserve reference of one incident/year; the lower and upper parameters are chosen uncertainty bounds, not observations or a cap on real incidents. Frequency counts incidents with eligible recovery activity incurred in the registered year, including carry-in.
+
+The severity policy allocates aggregate incremental recovery labour of `[10,40,160]` planned hours at a newly agreed GBP100/hour, plus illustrative incremental vendor/restoration allowances GBP `[0,1000,4000]`. Forty hours is a planning work-week reference, not a staffing count or a claim of available capacity. The resulting triple is a distribution parameter arrangement, not quantiles, actual invoice amounts or a real-world expense limit. Identical choices avoid unsupported institution-specific distinctions and were not fitted to known/future outcomes, assurance thresholds or the score bar. Warn and deny are equal: no mitigation benefit is assumed.
+
+The exact collection-policy.json establishes new prospective ledger identifiers:
+
+- driftwood/recovery-engineering-2027
+- tuppence/recovery-engineering-2027
+- ludlow/recovery-engineering-2027
+
+These are new policy namespaces, not assertions about pre-existing external accounting systems. Each covers its institution's complete eligible direct security response/restoration expense boundary. GBP100/hour is an agreed incremental labour charging rule, not an asserted salary or vendor invoice rate. Only attributable actual incremental work hours may be charged; a reserve budget is not an expense. Vendor/restoration costs require actual attributable invoices, never substitution of the planning allowance.
+
+Preserve nominal GBP expense-incurred UTC recognition within `[2027-01-01T00:00:00Z,2028-01-01T00:00:00Z)`: include eligible carry-in recovery activity, exclude carry-out cost, routine/already-budgeted operations, fines, premiums, missed sales and customer/patient losses. Allocate every actual source cost once across the full registered population and disclose shared incidents. The envelope, later profile and collector must bind the exact canonical collection-policy digest. The accepted criterion is money-empirical-crps/v1, bar `-1000`, with at least three complete final institutional cases; three is an operational minimum, not statistical power.
+
+One operator has delegated planning/accounting control across these institutions. Feeds, platform and nist have different genuine canonical GitHub source identities, but repository names or signatures do not establish organisational, operational or statistical independence. Shared control and dependence remain disclosed. Future worklogs, invoices, reconciliation and any non-event/no-additional-expense attestations require genuine separately attributable evidence and actual custodians. This policy appoints no independent custodian and supplies no such records.
+
+This initial source supplies a model envelope and accounting policy. It supplies no signed recovery-selecting contexts, profile/case registrations, empirical draws, incident records, outcomes, report, score, native release cage or completed release. Initial signed publication is a separate act. With no predecessor, comparison remains unobserved. Only after actual model/context publication may the complete candidate bundle and authenticated SDK bind their genuine refs. Each real forecast must be published immutably before 2027; never backdate. An empty ledger is unmeasured, not zero; a completed 30-day process assessment is not an annual outcome, and 2027 annual finality cannot precede 2028.
