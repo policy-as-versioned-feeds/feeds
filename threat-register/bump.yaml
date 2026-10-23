@@ -34,4 +34,7 @@
 # widen-to converter ABI. The unchanged payload/schema computes `none` under
 # bump.py; this reviewed minor is deliberately stronger (ADR-0011), not an
 # automatically measured ABI bump. No financial input or enrollment changes.
-bump: minor
+# RESET TO `none` 2026-10-23: threat-register/v4.1.0 is signed and published
+# (Release 421397920); this completed release has nothing left queued.
+# The released converter capability and feed data remain unchanged.
+bump: none
