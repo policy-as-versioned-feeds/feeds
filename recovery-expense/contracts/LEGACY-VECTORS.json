@@ -1,0 +1,403 @@
+{
+  "scope": "Actual pre-change deterministic source outputs; no new financial data, observation or score",
+  "source_commit": "98e6979123d42d673e7e81a9485302ef044e8f18",
+  "converter_sha256": "b33bc82346af03d5d80964c81991602f5507575980ea7eb049630f73d8a928ee",
+  "vectors": [
+    {
+      "path": "threat-register/v1/feed.json",
+      "institution": "driftwood",
+      "scenario": {
+        "version": "v1",
+        "name": "threat-register:v1 driftwood",
+        "note": "cart/checkout PII exfiltration (e-commerce, short-life cart data, high traffic/low sensitivity per-record). lef sourced from DBIR retail-sector web-app-attack base rate, editorial midpoint. MAGNITUDE UNSOURCED: the impact per event (1000.0, 4000.0, 9000.0) GBP is not in payload version v1, which predates the publisher's `lm_gbp` field; it is this converter's frozen copy of the adopter-keyed table that used to live in the SUBSCRIBER's own code (platform/feeds/to_fair_scenario.py THREAT_LM_GBP). From major 3 the number and its basis are in the payload. A named could-not-look (eco-system ticket 79 item 4), never a bare number.",
+        "warn": {
+          "lef": [
+            2.0,
+            4.0,
+            9.0
+          ],
+          "lm": [
+            1000.0,
+            4000.0,
+            9000.0
+          ]
+        },
+        "deny": {
+          "lef": [
+            0,
+            0,
+            1
+          ],
+          "lm": [
+            1000.0,
+            4000.0,
+            9000.0
+          ]
+        }
+      }
+    },
+    {
+      "path": "threat-register/v1/feed.json",
+      "institution": "tuppence",
+      "scenario": {
+        "version": "v1",
+        "name": "threat-register:v1 tuppence",
+        "note": "payment-fraud / account-takeover via API abuse (fintech, FCA/PCI, availability+fraud flavour). lef sourced from DBIR financial-sector base rate + card-scheme fraud-loss reporting, editorial midpoint. MAGNITUDE UNSOURCED: the impact per event (5000.0, 25000.0, 90000.0) GBP is not in payload version v1, which predates the publisher's `lm_gbp` field; it is this converter's frozen copy of the adopter-keyed table that used to live in the SUBSCRIBER's own code (platform/feeds/to_fair_scenario.py THREAT_LM_GBP). From major 3 the number and its basis are in the payload. A named could-not-look (eco-system ticket 79 item 4), never a bare number.",
+        "warn": {
+          "lef": [
+            3.0,
+            6.0,
+            14.0
+          ],
+          "lm": [
+            5000.0,
+            25000.0,
+            90000.0
+          ]
+        },
+        "deny": {
+          "lef": [
+            0,
+            0,
+            1
+          ],
+          "lm": [
+            5000.0,
+            25000.0,
+            90000.0
+          ]
+        }
+      }
+    },
+    {
+      "path": "threat-register/v1/feed.json",
+      "institution": "ludlow",
+      "scenario": {
+        "version": "v1",
+        "name": "threat-register:v1 ludlow",
+        "note": "confidential health-record exfiltration (HIPAA, decades-confidential, HNDL/harvest-now-decrypt-later exposure). lef sourced from DBIR healthcare-sector base rate, editorial midpoint -- lower frequency, far higher confidentiality horizon. MAGNITUDE UNSOURCED: the impact per event (20000.0, 100000.0, 400000.0) GBP is not in payload version v1, which predates the publisher's `lm_gbp` field; it is this converter's frozen copy of the adopter-keyed table that used to live in the SUBSCRIBER's own code (platform/feeds/to_fair_scenario.py THREAT_LM_GBP). From major 3 the number and its basis are in the payload. A named could-not-look (eco-system ticket 79 item 4), never a bare number.",
+        "warn": {
+          "lef": [
+            1.0,
+            2.0,
+            5.0
+          ],
+          "lm": [
+            20000.0,
+            100000.0,
+            400000.0
+          ]
+        },
+        "deny": {
+          "lef": [
+            0,
+            0,
+            1
+          ],
+          "lm": [
+            20000.0,
+            100000.0,
+            400000.0
+          ]
+        }
+      }
+    },
+    {
+      "path": "threat-register/v2/feed.json",
+      "institution": "driftwood",
+      "scenario": {
+        "version": "v2",
+        "name": "threat-register:v2 driftwood",
+        "note": "cart/checkout PII exfiltration (e-commerce, short-life cart data, high traffic/low sensitivity per-record). lef sourced from DBIR retail-sector web-app-attack base rate, editorial midpoint. MAGNITUDE UNSOURCED: the impact per event (1000.0, 4000.0, 9000.0) GBP is not in payload version v2, which predates the publisher's `lm_gbp` field; it is this converter's frozen copy of the adopter-keyed table that used to live in the SUBSCRIBER's own code (platform/feeds/to_fair_scenario.py THREAT_LM_GBP). From major 3 the number and its basis are in the payload. A named could-not-look (eco-system ticket 79 item 4), never a bare number.",
+        "warn": {
+          "lef": [
+            2.0,
+            4.0,
+            9.0
+          ],
+          "lm": [
+            1000.0,
+            4000.0,
+            9000.0
+          ]
+        },
+        "deny": {
+          "lef": [
+            0,
+            0,
+            1
+          ],
+          "lm": [
+            1000.0,
+            4000.0,
+            9000.0
+          ]
+        }
+      }
+    },
+    {
+      "path": "threat-register/v2/feed.json",
+      "institution": "tuppence",
+      "scenario": {
+        "version": "v2",
+        "name": "threat-register:v2 tuppence",
+        "note": "payment-fraud / account-takeover via API abuse (fintech, FCA/PCI, availability+fraud flavour). lef sourced from DBIR financial-sector base rate + 2026 UK fintech ATO-uptick roundup, editorial midpoint. MAGNITUDE UNSOURCED: the impact per event (5000.0, 25000.0, 90000.0) GBP is not in payload version v2, which predates the publisher's `lm_gbp` field; it is this converter's frozen copy of the adopter-keyed table that used to live in the SUBSCRIBER's own code (platform/feeds/to_fair_scenario.py THREAT_LM_GBP). From major 3 the number and its basis are in the payload. A named could-not-look (eco-system ticket 79 item 4), never a bare number.",
+        "warn": {
+          "lef": [
+            4.0,
+            9.0,
+            20.0
+          ],
+          "lm": [
+            5000.0,
+            25000.0,
+            90000.0
+          ]
+        },
+        "deny": {
+          "lef": [
+            0,
+            0,
+            1
+          ],
+          "lm": [
+            5000.0,
+            25000.0,
+            90000.0
+          ]
+        }
+      }
+    },
+    {
+      "path": "threat-register/v2/feed.json",
+      "institution": "ludlow",
+      "scenario": {
+        "version": "v2",
+        "name": "threat-register:v2 ludlow",
+        "note": "confidential health-record exfiltration (HIPAA, decades-confidential, HNDL/harvest-now-decrypt-later exposure). lef sourced from DBIR healthcare-sector base rate, editorial midpoint -- lower frequency, far higher confidentiality horizon. MAGNITUDE UNSOURCED: the impact per event (20000.0, 100000.0, 400000.0) GBP is not in payload version v2, which predates the publisher's `lm_gbp` field; it is this converter's frozen copy of the adopter-keyed table that used to live in the SUBSCRIBER's own code (platform/feeds/to_fair_scenario.py THREAT_LM_GBP). From major 3 the number and its basis are in the payload. A named could-not-look (eco-system ticket 79 item 4), never a bare number.",
+        "warn": {
+          "lef": [
+            1.0,
+            2.0,
+            5.0
+          ],
+          "lm": [
+            20000.0,
+            100000.0,
+            400000.0
+          ]
+        },
+        "deny": {
+          "lef": [
+            0,
+            0,
+            1
+          ],
+          "lm": [
+            20000.0,
+            100000.0,
+            400000.0
+          ]
+        }
+      }
+    },
+    {
+      "path": "threat-register/v3/feed.json",
+      "institution": "driftwood",
+      "scenario": {
+        "version": "v3",
+        "name": "threat-register:v3 driftwood",
+        "note": "cart/checkout PII exfiltration (e-commerce, short-life cart data, high traffic/low sensitivity per-record). Frequency basis (editorial, read 2026-09-09): Annual loss-event frequency for this institution's headline threat. DBIR retail-sector web-app-attack base rate, editorial midpoint COULD NOT LOOK: the DBIR publishes sector breach-frequency ranges, not a rate for one named institution, and no run of this estate has counted events for these three. Editorial midpoints, labelled as such. Magnitude basis (editorial, read 2026-09-09): Impact per cart/checkout PII exfiltration event for a mid-market UK e-commerce institution: short-life cart data, high traffic, low sensitivity per record. COULD NOT LOOK: no run of this estate has counted per-event losses for any institution in this register, and none of the three publishes one. These are the publisher's editorial bands, moved here from platform/feeds/to_fair_scenario.py's THREAT_LM_GBP unchanged so that the move itself moves no price. What would close it: a per-sector per-event loss figure with a published source and a date, or an institution's own signed incident cost.",
+        "warn": {
+          "lef": [
+            2.0,
+            4.0,
+            9.0
+          ],
+          "lm": [
+            1000.0,
+            4000.0,
+            9000.0
+          ]
+        },
+        "deny": {
+          "lef": [
+            0,
+            0,
+            1
+          ],
+          "lm": [
+            1000.0,
+            4000.0,
+            9000.0
+          ]
+        }
+      }
+    },
+    {
+      "path": "threat-register/v3/feed.json",
+      "institution": "tuppence",
+      "scenario": {
+        "version": "v3",
+        "name": "threat-register:v3 tuppence",
+        "note": "payment-fraud / account-takeover via API abuse (fintech, FCA/PCI, availability+fraud flavour). Frequency basis (editorial, read 2026-09-09): Annual loss-event frequency for this institution's headline threat. DBIR financial-sector base rate + 2026 UK fintech ATO-uptick roundup, editorial midpoint COULD NOT LOOK: the DBIR publishes sector breach-frequency ranges, not a rate for one named institution, and no run of this estate has counted events for these three. Editorial midpoints, labelled as such. Magnitude basis (editorial, read 2026-09-09): Impact per payment-fraud / account-takeover event for a UK fintech: direct fraud loss plus reimbursement, higher per event than retail PII and far below a health record. COULD NOT LOOK: no run of this estate has counted per-event losses for any institution in this register, and none of the three publishes one. These are the publisher's editorial bands, moved here from platform/feeds/to_fair_scenario.py's THREAT_LM_GBP unchanged so that the move itself moves no price. What would close it: a per-sector per-event loss figure with a published source and a date, or an institution's own signed incident cost.",
+        "warn": {
+          "lef": [
+            4.0,
+            9.0,
+            20.0
+          ],
+          "lm": [
+            5000.0,
+            25000.0,
+            90000.0
+          ]
+        },
+        "deny": {
+          "lef": [
+            0,
+            0,
+            1
+          ],
+          "lm": [
+            5000.0,
+            25000.0,
+            90000.0
+          ]
+        }
+      }
+    },
+    {
+      "path": "threat-register/v3/feed.json",
+      "institution": "ludlow",
+      "scenario": {
+        "version": "v3",
+        "name": "threat-register:v3 ludlow",
+        "note": "confidential health-record exfiltration (HIPAA, decades-confidential, HNDL/harvest-now-decrypt-later exposure). Frequency basis (editorial, read 2026-09-09): Annual loss-event frequency for this institution's headline threat. DBIR healthcare-sector base rate, editorial midpoint -- lower frequency, far higher confidentiality horizon COULD NOT LOOK: the DBIR publishes sector breach-frequency ranges, not a rate for one named institution, and no run of this estate has counted events for these three. Editorial midpoints, labelled as such. Magnitude basis (editorial, read 2026-09-09): Impact per confidential health-record exfiltration event: decades-confidential data with a harvest-now-decrypt-later horizon, the highest per-event band in this register. COULD NOT LOOK: no run of this estate has counted per-event losses for any institution in this register, and none of the three publishes one. These are the publisher's editorial bands, moved here from platform/feeds/to_fair_scenario.py's THREAT_LM_GBP unchanged so that the move itself moves no price. What would close it: a per-sector per-event loss figure with a published source and a date, or an institution's own signed incident cost.",
+        "warn": {
+          "lef": [
+            1.0,
+            2.0,
+            5.0
+          ],
+          "lm": [
+            20000.0,
+            100000.0,
+            400000.0
+          ]
+        },
+        "deny": {
+          "lef": [
+            0,
+            0,
+            1
+          ],
+          "lm": [
+            20000.0,
+            100000.0,
+            400000.0
+          ]
+        }
+      }
+    },
+    {
+      "path": "threat-register/v4/feed.json",
+      "institution": "driftwood",
+      "scenario": {
+        "version": "v4",
+        "name": "threat-register:v4 driftwood",
+        "note": "cart/checkout PII exfiltration (e-commerce, short-life cart data, high traffic/low sensitivity per-record). Frequency basis (editorial, read 2026-09-09): Annual loss-event frequency for this institution's headline threat. DBIR retail-sector web-app-attack base rate, editorial midpoint COULD NOT LOOK: the DBIR publishes sector breach-frequency ranges, not a rate for one named institution, and no run of this estate has counted events for these three. Editorial midpoints, labelled as such. Magnitude basis (editorial, read 2026-09-09): Impact per cart/checkout PII exfiltration event for a mid-market UK e-commerce institution: short-life cart data, high traffic, low sensitivity per record. COULD NOT LOOK: no run of this estate has counted per-event losses for any institution in this register, and none of the three publishes one. These are the publisher's editorial bands, moved here from platform/feeds/to_fair_scenario.py's THREAT_LM_GBP unchanged so that the move itself moves no price. What would close it: a per-sector per-event loss figure with a published source and a date, or an institution's own signed incident cost.",
+        "warn": {
+          "lef": [
+            2.0,
+            4.0,
+            9.0
+          ],
+          "lm": [
+            1000.0,
+            4000.0,
+            9000.0
+          ]
+        },
+        "deny": {
+          "lef": [
+            0,
+            0,
+            1
+          ],
+          "lm": [
+            1000.0,
+            4000.0,
+            9000.0
+          ]
+        }
+      }
+    },
+    {
+      "path": "threat-register/v4/feed.json",
+      "institution": "tuppence",
+      "scenario": {
+        "version": "v4",
+        "name": "threat-register:v4 tuppence",
+        "note": "payment-fraud / account-takeover via API abuse (fintech, FCA/PCI, availability+fraud flavour). Frequency basis (editorial, read 2026-09-09): Annual loss-event frequency for this institution's headline threat. DBIR financial-sector base rate + 2026 UK fintech ATO-uptick roundup, editorial midpoint COULD NOT LOOK: the DBIR publishes sector breach-frequency ranges, not a rate for one named institution, and no run of this estate has counted events for these three. Editorial midpoints, labelled as such. Magnitude basis (editorial, read 2026-09-09): Impact per payment-fraud / account-takeover event for a UK fintech: direct fraud loss plus reimbursement, higher per event than retail PII and far below a health record. COULD NOT LOOK: no run of this estate has counted per-event losses for any institution in this register, and none of the three publishes one. These are the publisher's editorial bands, moved here from platform/feeds/to_fair_scenario.py's THREAT_LM_GBP unchanged so that the move itself moves no price. What would close it: a per-sector per-event loss figure with a published source and a date, or an institution's own signed incident cost.",
+        "warn": {
+          "lef": [
+            4.0,
+            9.0,
+            20.0
+          ],
+          "lm": [
+            5000.0,
+            25000.0,
+            90000.0
+          ]
+        },
+        "deny": {
+          "lef": [
+            0,
+            0,
+            1
+          ],
+          "lm": [
+            5000.0,
+            25000.0,
+            90000.0
+          ]
+        }
+      }
+    },
+    {
+      "path": "threat-register/v4/feed.json",
+      "institution": "ludlow",
+      "scenario": {
+        "version": "v4",
+        "name": "threat-register:v4 ludlow",
+        "note": "confidential health-record exfiltration (HIPAA, decades-confidential, HNDL/harvest-now-decrypt-later exposure). Frequency basis (editorial, read 2026-09-09): Annual loss-event frequency for this institution's headline threat. DBIR healthcare-sector base rate, editorial midpoint -- lower frequency, far higher confidentiality horizon COULD NOT LOOK: the DBIR publishes sector breach-frequency ranges, not a rate for one named institution, and no run of this estate has counted events for these three. Editorial midpoints, labelled as such. Magnitude basis (editorial, read 2026-09-09): Impact per confidential health-record exfiltration event: decades-confidential data with a harvest-now-decrypt-later horizon, the highest per-event band in this register. COULD NOT LOOK: no run of this estate has counted per-event losses for any institution in this register, and none of the three publishes one. These are the publisher's editorial bands, moved here from platform/feeds/to_fair_scenario.py's THREAT_LM_GBP unchanged so that the move itself moves no price. What would close it: a per-sector per-event loss figure with a published source and a date, or an institution's own signed incident cost.",
+        "warn": {
+          "lef": [
+            1.0,
+            2.0,
+            5.0
+          ],
+          "lm": [
+            20000.0,
+            100000.0,
+            400000.0
+          ]
+        },
+        "deny": {
+          "lef": [
+            0,
+            0,
+            1
+          ],
+          "lm": [
+            20000.0,
+            100000.0,
+            400000.0
+          ]
+        }
+      }
+    }
+  ]
+}

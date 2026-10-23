@@ -311,7 +311,7 @@ def main(args):
         raise Refused('run at the authenticated publisher repository root')
     if len(args) == 5 and args[0] == 'build':
         _, feed, tag, native_path, cage_path = args
-        if (PARTY == 'ico' and feed != 'penalty-schema') or (PARTY == 'feeds' and feed not in ('threat-register', 'cve', 'eol', 'fx', 'market-moves', 'news')):
+        if (PARTY == 'ico' and feed != 'penalty-schema') or (PARTY == 'feeds' and feed not in ('threat-register', 'cve', 'eol', 'fx', 'market-moves', 'news', 'recovery-expense')):
             raise Refused('ICO publishes penalty-schema')
         relative(feed)
         relative(native_path)

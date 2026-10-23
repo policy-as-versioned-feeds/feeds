@@ -1,0 +1,389 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://policy-as-versioned.dev/schema/feeds/direct-recovery-expense-v1.json",
+  "title": "Separate shadow institutional direct security-recovery expense model",
+  "description": "Recovery-expense major-1 model only. Explicit normative annual incident frequency and incremental nominal GBP severity per incident; no empirical or mitigation claim and no aggregation of workload contingencies.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "model",
+    "feed_version",
+    "published_by",
+    "currency",
+    "note",
+    "accounting",
+    "institutions",
+    "scope"
+  ],
+  "properties": {
+    "model": {
+      "const": "direct-security-recovery-expense/v1"
+    },
+    "feed_version": {
+      "const": "v1"
+    },
+    "published_by": {
+      "const": "feeds"
+    },
+    "currency": {
+      "const": "GBP"
+    },
+    "note": {
+      "type": "string",
+      "minLength": 1
+    },
+    "accounting": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "unit_basis",
+        "included",
+        "excluded",
+        "allocation",
+        "completeness",
+        "finality",
+        "collection_policy_sha256",
+        "recognition"
+      ],
+      "properties": {
+        "unit_basis": {
+          "const": "nominal direct security-incident recovery expense per registered subject-year"
+        },
+        "included": {
+          "const": [
+            "Incremental incident-response and restoration labour at an agreed charge-out rule, supported by worklogs",
+            "Actual incremental restoration/vendor invoices allocated once to a registered cost centre"
+          ]
+        },
+        "excluded": {
+          "const": [
+            "Routine controls and already-budgeted operating cost",
+            "Missed sales, fines, premiums, customer/patient losses",
+            "Double-counted shared incident costs, forecast-generated outcomes and synthetic tests"
+          ]
+        },
+        "allocation": {
+          "const": "Allocate each independently evidenced source cost once across registered cost centres; disclose shared incidents and dependence."
+        },
+        "completeness": {
+          "const": "Complete cost-centre incident ledger plus attributable invoices/worklogs and an independent final completeness attestation; an empty log is not zero."
+        },
+        "finality": {
+          "const": "Year-end independent reconciliation and signed final/complete record; unresolved or disputed amounts are ineligible. Closing within 31 days is a process target."
+        },
+        "collection_policy_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "recognition": {
+          "const": "Recognize eligible expense by incurred UTC date in the registered subject-year, not incident onset, payment or recording date. Annual frequency counts incidents with eligible recovery activity in that year, including carry-in; severity is only their eligible within-year incremental direct expense, excluding carry-out."
+        }
+      }
+    },
+    "institutions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "driftwood",
+        "tuppence",
+        "ludlow"
+      ],
+      "properties": {
+        "driftwood": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "lef",
+            "lm_gbp",
+            "lef_basis",
+            "lm_basis",
+            "cost_centres",
+            "parameter_source"
+          ],
+          "properties": {
+            "lef": {
+              "type": "array",
+              "minItems": 3,
+              "maxItems": 3,
+              "items": {
+                "type": "number",
+                "minimum": 0
+              },
+              "description": "Explicit normative annual count of recovery incidents incurring eligible activity within the expense-incurred subject-year, including carry-in; not just incident onsets."
+            },
+            "lm_gbp": {
+              "type": "array",
+              "minItems": 3,
+              "maxItems": 3,
+              "items": {
+                "type": "number",
+                "minimum": 0
+              },
+              "description": "Explicit normative incremental direct expense per recovery incident incurred within that same subject-year; no lifetime/carry-out expense."
+            },
+            "lef_basis": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "kind",
+                "statement",
+                "as_of"
+              ],
+              "properties": {
+                "kind": {
+                  "const": "normative-planning-unvalidated"
+                },
+                "statement": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "as_of": {
+                  "type": "string",
+                  "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+                }
+              }
+            },
+            "lm_basis": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "kind",
+                "statement",
+                "as_of"
+              ],
+              "properties": {
+                "kind": {
+                  "const": "normative-planning-unvalidated"
+                },
+                "statement": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "as_of": {
+                  "type": "string",
+                  "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+                }
+              }
+            },
+            "cost_centres": {
+              "type": "array",
+              "minItems": 1,
+              "maxItems": 128,
+              "uniqueItems": true,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "parameter_source": {
+              "const": "institution-level-owner-planning"
+            }
+          }
+        },
+        "tuppence": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "lef",
+            "lm_gbp",
+            "lef_basis",
+            "lm_basis",
+            "cost_centres",
+            "parameter_source"
+          ],
+          "properties": {
+            "lef": {
+              "type": "array",
+              "minItems": 3,
+              "maxItems": 3,
+              "items": {
+                "type": "number",
+                "minimum": 0
+              },
+              "description": "Explicit normative annual count of recovery incidents incurring eligible activity within the expense-incurred subject-year, including carry-in; not just incident onsets."
+            },
+            "lm_gbp": {
+              "type": "array",
+              "minItems": 3,
+              "maxItems": 3,
+              "items": {
+                "type": "number",
+                "minimum": 0
+              },
+              "description": "Explicit normative incremental direct expense per recovery incident incurred within that same subject-year; no lifetime/carry-out expense."
+            },
+            "lef_basis": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "kind",
+                "statement",
+                "as_of"
+              ],
+              "properties": {
+                "kind": {
+                  "const": "normative-planning-unvalidated"
+                },
+                "statement": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "as_of": {
+                  "type": "string",
+                  "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+                }
+              }
+            },
+            "lm_basis": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "kind",
+                "statement",
+                "as_of"
+              ],
+              "properties": {
+                "kind": {
+                  "const": "normative-planning-unvalidated"
+                },
+                "statement": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "as_of": {
+                  "type": "string",
+                  "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+                }
+              }
+            },
+            "cost_centres": {
+              "type": "array",
+              "minItems": 1,
+              "maxItems": 128,
+              "uniqueItems": true,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "parameter_source": {
+              "const": "institution-level-owner-planning"
+            }
+          }
+        },
+        "ludlow": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "lef",
+            "lm_gbp",
+            "lef_basis",
+            "lm_basis",
+            "cost_centres",
+            "parameter_source"
+          ],
+          "properties": {
+            "lef": {
+              "type": "array",
+              "minItems": 3,
+              "maxItems": 3,
+              "items": {
+                "type": "number",
+                "minimum": 0
+              },
+              "description": "Explicit normative annual count of recovery incidents incurring eligible activity within the expense-incurred subject-year, including carry-in; not just incident onsets."
+            },
+            "lm_gbp": {
+              "type": "array",
+              "minItems": 3,
+              "maxItems": 3,
+              "items": {
+                "type": "number",
+                "minimum": 0
+              },
+              "description": "Explicit normative incremental direct expense per recovery incident incurred within that same subject-year; no lifetime/carry-out expense."
+            },
+            "lef_basis": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "kind",
+                "statement",
+                "as_of"
+              ],
+              "properties": {
+                "kind": {
+                  "const": "normative-planning-unvalidated"
+                },
+                "statement": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "as_of": {
+                  "type": "string",
+                  "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+                }
+              }
+            },
+            "lm_basis": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "kind",
+                "statement",
+                "as_of"
+              ],
+              "properties": {
+                "kind": {
+                  "const": "normative-planning-unvalidated"
+                },
+                "statement": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "as_of": {
+                  "type": "string",
+                  "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+                }
+              }
+            },
+            "cost_centres": {
+              "type": "array",
+              "minItems": 1,
+              "maxItems": 128,
+              "uniqueItems": true,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "parameter_source": {
+              "const": "institution-level-owner-planning"
+            }
+          }
+        }
+      }
+    },
+    "release_cage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "git_blob"
+      ],
+      "properties": {
+        "path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "git_blob": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        }
+      }
+    },
+    "scope": {
+      "const": "shadow-collection-only"
+    }
+  }
+}

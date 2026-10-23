@@ -51,6 +51,12 @@ publishes:
     path: news
     payload_schema: news/payload.schema.json
     revoked: []
+  # Prospective shadow family; no artifact exists until explicit model parameters are reviewed.
+  - kind: feed
+    name: recovery-expense
+    path: recovery-expense
+    payload_schema: recovery-expense/payload.schema.json
+    revoked: []
 overlay:
   add: []
   restate: []

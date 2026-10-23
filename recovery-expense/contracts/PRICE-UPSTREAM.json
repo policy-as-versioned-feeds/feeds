@@ -1,0 +1,22 @@
+{
+  "repository": "https://github.com/policy-as-versioned-platform/platform",
+  "tag": "v5.4.0",
+  "tag_object": "3d7670f7e9fd5414caf62dca55a3056369abe6bc",
+  "commit": "5d45baa5923191dfd0e9cfb2cfaeae6906a41fce",
+  "tree": "ce8c4c53159cfbf273ceff5236113dc2f0cf0036",
+  "files": [
+    {
+      "path": "fair/fair.py",
+      "git_blob": "1e73bd8f6603ff1798268206cd1bcc6f0842975b",
+      "vendored_path": "publisher-reliability/vendor/fair/fair.py",
+      "sha256": "426c85c6d3c8a6095d80f1ac5c8efbe2bb5cacf8a49721141117051f4be8ec69"
+    },
+    {
+      "path": "fair/severity.py",
+      "git_blob": "5bbd7c698498dc7930ed5c1b7ed36abc663cd919",
+      "vendored_path": "publisher-reliability/vendor/fair/severity.py",
+      "sha256": "17237da0c67a7c0e8e09366797afdfa12d10005efe5beb64b2e294de86148c36"
+    }
+  ],
+  "scope": "Unmodified actual FAIR compound engine and same-tree dependency; empirical forecast representation is distinct from its continuous generating law."
+}

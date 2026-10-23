@@ -1,0 +1,2277 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$defs": {
+    "source_ref": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "party",
+        "tag",
+        "commit",
+        "path",
+        "git_blob"
+      ],
+      "properties": {
+        "party": {
+          "type": "string",
+          "minLength": 1
+        },
+        "tag": {
+          "type": "string",
+          "minLength": 1
+        },
+        "commit": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "git_blob": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        }
+      }
+    },
+    "tree_file_ref": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "git_blob"
+      ],
+      "properties": {
+        "path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "git_blob": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        }
+      }
+    },
+    "unit": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "currency",
+        "basis"
+      ],
+      "properties": {
+        "currency": {
+          "type": "string",
+          "pattern": "^[A-Z]{3}$"
+        },
+        "basis": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "horizon": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "starts_at",
+        "ends_at",
+        "boundary"
+      ],
+      "properties": {
+        "starts_at": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$"
+        },
+        "ends_at": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$"
+        },
+        "boundary": {
+          "const": "[start,end)"
+        }
+      }
+    },
+    "profile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema",
+        "id",
+        "criterion",
+        "outcome_kind",
+        "target_feed",
+        "unit",
+        "definition",
+        "horizon_rule",
+        "resolver_rule",
+        "population",
+        "generator"
+      ],
+      "properties": {
+        "schema": {
+          "const": "publisher-reliability/price-profile-v1"
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "criterion": {
+          "const": "money-empirical-crps/v1"
+        },
+        "outcome_kind": {
+          "const": "annual-aggregate-loss/v1"
+        },
+        "target_feed": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "publisher",
+            "name"
+          ],
+          "properties": {
+            "publisher": {
+              "type": "string",
+              "minLength": 1
+            },
+            "name": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "unit": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "currency",
+            "basis"
+          ],
+          "properties": {
+            "currency": {
+              "type": "string",
+              "pattern": "^[A-Z]{3}$"
+            },
+            "basis": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "definition": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "loss_categories",
+            "accounting_rule",
+            "completeness_rule",
+            "finality_rule"
+          ],
+          "properties": {
+            "loss_categories": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "accounting_rule": {
+              "type": "string",
+              "minLength": 1
+            },
+            "completeness_rule": {
+              "type": "string",
+              "minLength": 1
+            },
+            "finality_rule": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "horizon_rule": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "duration",
+            "boundary",
+            "calendar"
+          ],
+          "properties": {
+            "duration": {
+              "const": "P1Y"
+            },
+            "boundary": {
+              "const": "[start,end)"
+            },
+            "calendar": {
+              "const": "UTC-Gregorian"
+            }
+          }
+        },
+        "resolver_rule": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "party",
+            "source_schema",
+            "amount_pointer",
+            "finality_pointer",
+            "completeness_pointer",
+            "evidence_uri_prefix"
+          ],
+          "properties": {
+            "party": {
+              "type": "string",
+              "minLength": 1
+            },
+            "source_schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "amount_pointer": {
+              "type": "string",
+              "minLength": 1
+            },
+            "finality_pointer": {
+              "type": "string",
+              "minLength": 1
+            },
+            "completeness_pointer": {
+              "type": "string",
+              "minLength": 1
+            },
+            "evidence_uri_prefix": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "population": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "case_inventory",
+            "registration_deadline",
+            "aggregation",
+            "overlap_rule"
+          ],
+          "properties": {
+            "case_inventory": {
+              "$ref": "#/$defs/tree_file_ref"
+            },
+            "registration_deadline": {
+              "const": "strictly-before-horizon-start"
+            },
+            "aggregation": {
+              "const": "equal-case-mean"
+            },
+            "overlap_rule": {
+              "const": "distinct-case-subject-horizon-no-overlap"
+            }
+          }
+        },
+        "generator": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "engine",
+            "state",
+            "parameter_policy"
+          ],
+          "properties": {
+            "kind": {
+              "const": "pinned-fair-annual-empirical/v1"
+            },
+            "engine": {
+              "$ref": "#/$defs/source_ref"
+            },
+            "state": {
+              "const": "warn"
+            },
+            "parameter_policy": {
+              "const": "explicit-per-registration-recorded-not-inferred"
+            }
+          }
+        }
+      }
+    },
+    "case_inventory": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema",
+        "profile_id",
+        "cases"
+      ],
+      "properties": {
+        "schema": {
+          "const": "publisher-reliability/price-cases-v1"
+        },
+        "profile_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "cases": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "case_id",
+              "subject",
+              "perspective",
+              "horizon",
+              "context_ref"
+            ],
+            "properties": {
+              "case_id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "subject": {
+                "type": "string",
+                "minLength": 1
+              },
+              "perspective": {
+                "type": "string",
+                "minLength": 1
+              },
+              "horizon": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "starts_at",
+                  "ends_at",
+                  "boundary"
+                ],
+                "properties": {
+                  "starts_at": {
+                    "type": "string",
+                    "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$"
+                  },
+                  "ends_at": {
+                    "type": "string",
+                    "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$"
+                  },
+                  "boundary": {
+                    "const": "[start,end)"
+                  }
+                }
+              },
+              "context_ref": {
+                "$ref": "#/$defs/source_ref"
+              }
+            }
+          }
+        }
+      }
+    },
+    "generator": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "engine",
+        "converter",
+        "invocation",
+        "context_ref",
+        "scenario",
+        "state",
+        "seed",
+        "iterations"
+      ],
+      "properties": {
+        "kind": {
+          "const": "pinned-fair-annual-empirical/v1"
+        },
+        "engine": {
+          "$ref": "#/$defs/source_ref"
+        },
+        "converter": {
+          "$ref": "#/$defs/source_ref"
+        },
+        "invocation": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "context_ref": {
+          "$ref": "#/$defs/source_ref"
+        },
+        "scenario": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "version",
+            "name",
+            "warn",
+            "deny"
+          ],
+          "properties": {
+            "version": {
+              "type": "string",
+              "minLength": 1
+            },
+            "name": {
+              "type": "string",
+              "minLength": 1
+            },
+            "warn": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "lef",
+                "lm"
+              ],
+              "properties": {
+                "lef": {
+                  "type": "array",
+                  "minItems": 3,
+                  "maxItems": 3,
+                  "items": {
+                    "type": "number",
+                    "minimum": 0
+                  }
+                },
+                "lm": {
+                  "anyOf": [
+                    {
+                      "type": "array",
+                      "minItems": 3,
+                      "maxItems": 3,
+                      "items": {
+                        "type": "number",
+                        "minimum": 0
+                      }
+                    },
+                    {
+                      "type": "array",
+                      "minItems": 1,
+                      "items": {
+                        "type": "array",
+                        "minItems": 3,
+                        "maxItems": 3,
+                        "items": {
+                          "type": "number",
+                          "minimum": 0
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "deny": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "lef",
+                "lm"
+              ],
+              "properties": {
+                "lef": {
+                  "type": "array",
+                  "minItems": 3,
+                  "maxItems": 3,
+                  "items": {
+                    "type": "number",
+                    "minimum": 0
+                  }
+                },
+                "lm": {
+                  "anyOf": [
+                    {
+                      "type": "array",
+                      "minItems": 3,
+                      "maxItems": 3,
+                      "items": {
+                        "type": "number",
+                        "minimum": 0
+                      }
+                    },
+                    {
+                      "type": "array",
+                      "minItems": 1,
+                      "items": {
+                        "type": "array",
+                        "minItems": 3,
+                        "maxItems": 3,
+                        "items": {
+                          "type": "number",
+                          "minimum": 0
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "note": {
+              "type": "string"
+            }
+          },
+          "description": "Existing finite bounded PERT FAIR scenario subset, exact same source/state arrangement; other severity families refuse this adapter."
+        },
+        "state": {
+          "const": "warn"
+        },
+        "seed": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 2147483647
+        },
+        "iterations": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1000000
+        }
+      }
+    },
+    "distribution": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "total_count",
+        "atoms"
+      ],
+      "properties": {
+        "kind": {
+          "const": "weighted-empirical/v1"
+        },
+        "total_count": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1000000
+        },
+        "atoms": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "value",
+              "count"
+            ],
+            "properties": {
+              "value": {
+                "type": "string",
+                "pattern": "^-?(0|[1-9][0-9]*)(\\.[0-9]+)?$",
+                "description": "Canonical exact decimal, no exponent wire encoding; bounded digits/exponent on input before normalization, no bool/float/nonfinite."
+              },
+              "count": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 1000000
+              }
+            }
+          }
+        }
+      }
+    },
+    "forecast": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema",
+        "target",
+        "profile",
+        "case_id",
+        "subject",
+        "perspective",
+        "horizon",
+        "unit",
+        "emitted_at",
+        "generator",
+        "distribution"
+      ],
+      "properties": {
+        "schema": {
+          "const": "publisher-reliability/price-forecast-v1"
+        },
+        "target": {
+          "$ref": "#/$defs/source_ref"
+        },
+        "profile": {
+          "$ref": "#/$defs/source_ref"
+        },
+        "case_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "subject": {
+          "type": "string",
+          "minLength": 1
+        },
+        "perspective": {
+          "type": "string",
+          "minLength": 1
+        },
+        "horizon": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "starts_at",
+            "ends_at",
+            "boundary"
+          ],
+          "properties": {
+            "starts_at": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$"
+            },
+            "ends_at": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$"
+            },
+            "boundary": {
+              "const": "[start,end)"
+            }
+          }
+        },
+        "unit": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "currency",
+            "basis"
+          ],
+          "properties": {
+            "currency": {
+              "type": "string",
+              "pattern": "^[A-Z]{3}$"
+            },
+            "basis": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "emitted_at": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$"
+        },
+        "generator": {
+          "$ref": "#/$defs/generator"
+        },
+        "distribution": {
+          "$ref": "#/$defs/distribution"
+        }
+      }
+    },
+    "resolution": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema",
+        "forecast",
+        "profile",
+        "case_id",
+        "subject",
+        "perspective",
+        "horizon",
+        "unit",
+        "observed",
+        "resolved_at",
+        "published_at",
+        "source",
+        "evidence_uri"
+      ],
+      "properties": {
+        "schema": {
+          "const": "publisher-reliability/price-resolution-v1"
+        },
+        "forecast": {
+          "$ref": "#/$defs/source_ref"
+        },
+        "profile": {
+          "$ref": "#/$defs/source_ref"
+        },
+        "case_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "subject": {
+          "type": "string",
+          "minLength": 1
+        },
+        "perspective": {
+          "type": "string",
+          "minLength": 1
+        },
+        "horizon": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "starts_at",
+            "ends_at",
+            "boundary"
+          ],
+          "properties": {
+            "starts_at": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$"
+            },
+            "ends_at": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$"
+            },
+            "boundary": {
+              "const": "[start,end)"
+            }
+          }
+        },
+        "unit": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "currency",
+            "basis"
+          ],
+          "properties": {
+            "currency": {
+              "type": "string",
+              "pattern": "^[A-Z]{3}$"
+            },
+            "basis": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "observed": {
+          "type": "string",
+          "pattern": "^-?(0|[1-9][0-9]*)(\\.[0-9]+)?$",
+          "description": "Canonical exact decimal, no exponent wire encoding; bounded digits/exponent on input before normalization, no bool/float/nonfinite."
+        },
+        "resolved_at": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$"
+        },
+        "published_at": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$"
+        },
+        "source": {
+          "$ref": "#/$defs/source_ref"
+        },
+        "evidence_uri": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "inputs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema",
+        "profile",
+        "target",
+        "cases"
+      ],
+      "properties": {
+        "schema": {
+          "const": "publisher-reliability/price-inputs-v1"
+        },
+        "profile": {
+          "$ref": "#/$defs/source_ref"
+        },
+        "target": {
+          "$ref": "#/$defs/source_ref"
+        },
+        "cases": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "case_id",
+              "forecast",
+              "resolution"
+            ],
+            "properties": {
+              "case_id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "forecast": {
+                "anyOf": [
+                  {
+                    "$ref": "#/$defs/source_ref"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "resolution": {
+                "anyOf": [
+                  {
+                    "$ref": "#/$defs/source_ref"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "release_cage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema",
+        "target_name",
+        "target_version",
+        "published_as",
+        "outcome",
+        "tier",
+        "declared_bump",
+        "computed_bump",
+        "suffix",
+        "native_evidence",
+        "gate_code"
+      ],
+      "properties": {
+        "schema": {
+          "const": "publisher-release-cage/v1"
+        },
+        "target_name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "target_version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "published_as": {
+          "type": "string",
+          "minLength": 1
+        },
+        "outcome": {
+          "enum": [
+            "passed",
+            "degraded"
+          ]
+        },
+        "tier": {
+          "enum": [
+            "baseline",
+            "quarantine"
+          ]
+        },
+        "declared_bump": {
+          "enum": [
+            "none",
+            "patch",
+            "minor",
+            "major"
+          ]
+        },
+        "computed_bump": {
+          "enum": [
+            "none",
+            "patch",
+            "minor",
+            "major"
+          ]
+        },
+        "suffix": {
+          "anyOf": [
+            {
+              "const": "quarantine"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "native_evidence": {
+          "$ref": "#/$defs/tree_file_ref"
+        },
+        "gate_code": {
+          "$ref": "#/$defs/tree_file_ref"
+        }
+      }
+    },
+    "widening_declaration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema",
+        "id",
+        "profile_id",
+        "unit",
+        "authority",
+        "authoritative_value_action",
+        "affected_sources",
+        "citation",
+        "release_cage",
+        "target"
+      ],
+      "properties": {
+        "schema": {
+          "const": "publisher-reliability/widening-v1"
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "profile_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "unit": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "currency",
+            "basis"
+          ],
+          "properties": {
+            "currency": {
+              "type": "string",
+              "pattern": "^[A-Z]{3}$"
+            },
+            "basis": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "authority": {
+          "enum": [
+            "publisher-loss-model",
+            "regulator-conservative-exposure"
+          ]
+        },
+        "authoritative_value_action": {
+          "const": "preserve"
+        },
+        "affected_sources": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^/(warn|deny)/lm(/[0-9]+)?$"
+          }
+        },
+        "citation": {
+          "type": "string",
+          "minLength": 1
+        },
+        "release_cage": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "path",
+            "git_blob"
+          ],
+          "properties": {
+            "path": {
+              "type": "string",
+              "minLength": 1
+            },
+            "git_blob": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "target": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "version",
+            "name",
+            "warn",
+            "deny"
+          ],
+          "properties": {
+            "version": {
+              "type": "string",
+              "minLength": 1
+            },
+            "name": {
+              "type": "string",
+              "minLength": 1
+            },
+            "warn": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "lef",
+                "lm"
+              ],
+              "properties": {
+                "lef": {
+                  "type": "array",
+                  "minItems": 3,
+                  "maxItems": 3,
+                  "items": {
+                    "type": "number",
+                    "minimum": 0
+                  }
+                },
+                "lm": {
+                  "anyOf": [
+                    {
+                      "type": "array",
+                      "minItems": 3,
+                      "maxItems": 3,
+                      "items": {
+                        "type": "number",
+                        "minimum": 0
+                      }
+                    },
+                    {
+                      "type": "array",
+                      "minItems": 1,
+                      "items": {
+                        "type": "array",
+                        "minItems": 3,
+                        "maxItems": 3,
+                        "items": {
+                          "type": "number",
+                          "minimum": 0
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "deny": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "lef",
+                "lm"
+              ],
+              "properties": {
+                "lef": {
+                  "type": "array",
+                  "minItems": 3,
+                  "maxItems": 3,
+                  "items": {
+                    "type": "number",
+                    "minimum": 0
+                  }
+                },
+                "lm": {
+                  "anyOf": [
+                    {
+                      "type": "array",
+                      "minItems": 3,
+                      "maxItems": 3,
+                      "items": {
+                        "type": "number",
+                        "minimum": 0
+                      }
+                    },
+                    {
+                      "type": "array",
+                      "minItems": 1,
+                      "items": {
+                        "type": "array",
+                        "minItems": 3,
+                        "maxItems": 3,
+                        "items": {
+                          "type": "number",
+                          "minimum": 0
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "note": {
+              "type": "string"
+            }
+          },
+          "description": "Existing finite bounded PERT FAIR scenario subset, exact same source/state arrangement; other severity families refuse this adapter."
+        }
+      }
+    },
+    "adopter_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema",
+        "target_edge",
+        "report",
+        "profile",
+        "criterion",
+        "unit",
+        "minimum_cases",
+        "aggregation",
+        "bar",
+        "on_below",
+        "widening"
+      ],
+      "properties": {
+        "schema": {
+          "const": "publisher-reliability/adopter-policy-v1"
+        },
+        "target_edge": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "party",
+            "name",
+            "version"
+          ],
+          "properties": {
+            "party": {
+              "type": "string",
+              "minLength": 1
+            },
+            "name": {
+              "type": "string",
+              "minLength": 1
+            },
+            "version": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "report": {
+          "$ref": "#/$defs/source_ref"
+        },
+        "profile": {
+          "$ref": "#/$defs/source_ref"
+        },
+        "criterion": {
+          "const": "money-empirical-crps/v1"
+        },
+        "unit": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "currency",
+            "basis"
+          ],
+          "properties": {
+            "currency": {
+              "type": "string",
+              "pattern": "^[A-Z]{3}$"
+            },
+            "basis": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "minimum_cases": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 10000
+        },
+        "aggregation": {
+          "const": "equal-case-mean"
+        },
+        "bar": {
+          "type": "string",
+          "pattern": "^-?(0|[1-9][0-9]*)(\\.[0-9]+)?$",
+          "description": "Canonical exact decimal, no exponent wire encoding; bounded digits/exponent on input before normalization, no bool/float/nonfinite."
+        },
+        "on_below": {
+          "const": "publisher-widen-to/v1"
+        },
+        "widening": {
+          "$ref": "#/$defs/source_ref"
+        }
+      }
+    },
+    "loss": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "numerator",
+        "denominator"
+      ],
+      "properties": {
+        "numerator": {
+          "type": "string",
+          "pattern": "^(0|[1-9][0-9]*)$",
+          "maxLength": 2500
+        },
+        "denominator": {
+          "type": "string",
+          "pattern": "^[1-9][0-9]*$",
+          "maxLength": 2500
+        }
+      }
+    },
+    "score": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "numerator",
+        "denominator"
+      ],
+      "properties": {
+        "numerator": {
+          "type": "string",
+          "pattern": "^-?(0|[1-9][0-9]*)$",
+          "maxLength": 2500
+        },
+        "denominator": {
+          "type": "string",
+          "pattern": "^[1-9][0-9]*$",
+          "maxLength": 2500
+        }
+      }
+    },
+    "report": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema",
+        "scorer",
+        "cutoff",
+        "profile",
+        "target",
+        "unit",
+        "criterion",
+        "score_direction",
+        "cohort",
+        "status",
+        "counts",
+        "loss",
+        "score",
+        "cases",
+        "tool",
+        "inputs",
+        "claim_scope"
+      ],
+      "properties": {
+        "schema": {
+          "const": "publisher-reliability/price-report-v1"
+        },
+        "scorer": {
+          "type": "string",
+          "minLength": 1
+        },
+        "cutoff": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$"
+        },
+        "profile": {
+          "$ref": "#/$defs/source_ref"
+        },
+        "target": {
+          "$ref": "#/$defs/source_ref"
+        },
+        "unit": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "currency",
+            "basis"
+          ],
+          "properties": {
+            "currency": {
+              "type": "string",
+              "pattern": "^[A-Z]{3}$"
+            },
+            "basis": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "criterion": {
+          "const": "money-empirical-crps/v1"
+        },
+        "score_direction": {
+          "const": "higher-is-better"
+        },
+        "cohort": {
+          "$ref": "#/$defs/source_ref"
+        },
+        "status": {
+          "enum": [
+            "measured",
+            "unmeasured"
+          ]
+        },
+        "counts": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "registered_cases",
+            "eligible",
+            "unscoreable"
+          ],
+          "properties": {
+            "registered_cases": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "eligible": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "unscoreable": {
+              "type": "integer",
+              "minimum": 0
+            }
+          }
+        },
+        "loss": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/loss"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "score": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/score"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "cases": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "case_id",
+              "forecast",
+              "resolution",
+              "state",
+              "reason",
+              "loss"
+            ],
+            "properties": {
+              "case_id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "forecast": {
+                "anyOf": [
+                  {
+                    "$ref": "#/$defs/source_ref"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "resolution": {
+                "anyOf": [
+                  {
+                    "$ref": "#/$defs/source_ref"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "state": {
+                "enum": [
+                  "eligible",
+                  "unscoreable"
+                ]
+              },
+              "reason": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "loss": {
+                "anyOf": [
+                  {
+                    "$ref": "#/$defs/loss"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "tool": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "source_files",
+            "generator_engine"
+          ],
+          "properties": {
+            "source_files": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/tree_file_ref"
+              }
+            },
+            "generator_engine": {
+              "$ref": "#/$defs/source_ref"
+            }
+          }
+        },
+        "inputs": {
+          "$ref": "#/$defs/inputs"
+        },
+        "claim_scope": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "measure",
+            "population",
+            "calibration_guarantee",
+            "binary_report_relabelled"
+          ],
+          "properties": {
+            "measure": {
+              "const": "declared-annual-monetary-empirical-CDF-error"
+            },
+            "population": {
+              "const": "exact-registered-cohort-only"
+            },
+            "calibration_guarantee": {
+              "const": false
+            },
+            "binary_report_relabelled": {
+              "const": false
+            }
+          }
+        }
+      }
+    },
+    "widen_context": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema",
+        "target",
+        "profile",
+        "widening",
+        "adopter_party",
+        "adopter_context",
+        "base_scenario",
+        "state",
+        "financial_as_of"
+      ],
+      "properties": {
+        "schema": {
+          "const": "publisher-reliability/widen-context-v1"
+        },
+        "target": {
+          "$ref": "#/$defs/source_ref"
+        },
+        "profile": {
+          "$ref": "#/$defs/source_ref"
+        },
+        "widening": {
+          "$ref": "#/$defs/source_ref"
+        },
+        "adopter_party": {
+          "type": "string",
+          "minLength": 1
+        },
+        "adopter_context": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/source_ref"
+            },
+            {
+              "$ref": "#/$defs/tree_file_ref"
+            }
+          ],
+          "description": "The current adopter party document may be a same-tree party.yaml reference under the enclosing adopter source. Fresh composition is prospective; signed replay authenticates its enclosing adopter tag. Historical forecast context_ref remains a full signed SourceRef."
+        },
+        "base_scenario": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "version",
+            "name",
+            "warn",
+            "deny"
+          ],
+          "properties": {
+            "version": {
+              "type": "string",
+              "minLength": 1
+            },
+            "name": {
+              "type": "string",
+              "minLength": 1
+            },
+            "warn": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "lef",
+                "lm"
+              ],
+              "properties": {
+                "lef": {
+                  "type": "array",
+                  "minItems": 3,
+                  "maxItems": 3,
+                  "items": {
+                    "type": "number",
+                    "minimum": 0
+                  }
+                },
+                "lm": {
+                  "anyOf": [
+                    {
+                      "type": "array",
+                      "minItems": 3,
+                      "maxItems": 3,
+                      "items": {
+                        "type": "number",
+                        "minimum": 0
+                      }
+                    },
+                    {
+                      "type": "array",
+                      "minItems": 1,
+                      "items": {
+                        "type": "array",
+                        "minItems": 3,
+                        "maxItems": 3,
+                        "items": {
+                          "type": "number",
+                          "minimum": 0
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "deny": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "lef",
+                "lm"
+              ],
+              "properties": {
+                "lef": {
+                  "type": "array",
+                  "minItems": 3,
+                  "maxItems": 3,
+                  "items": {
+                    "type": "number",
+                    "minimum": 0
+                  }
+                },
+                "lm": {
+                  "anyOf": [
+                    {
+                      "type": "array",
+                      "minItems": 3,
+                      "maxItems": 3,
+                      "items": {
+                        "type": "number",
+                        "minimum": 0
+                      }
+                    },
+                    {
+                      "type": "array",
+                      "minItems": 1,
+                      "items": {
+                        "type": "array",
+                        "minItems": 3,
+                        "maxItems": 3,
+                        "items": {
+                          "type": "number",
+                          "minimum": 0
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "note": {
+              "type": "string"
+            }
+          },
+          "description": "Existing finite bounded PERT FAIR scenario subset, exact same source/state arrangement; other severity families refuse this adapter."
+        },
+        "state": {
+          "const": "warn"
+        },
+        "financial_as_of": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+        }
+      }
+    },
+    "widen_result": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema",
+        "target_id",
+        "profile_id",
+        "scenario",
+        "authority_action",
+        "affected_sources"
+      ],
+      "properties": {
+        "schema": {
+          "const": "publisher-reliability/widen-result-v1"
+        },
+        "target_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "profile_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "scenario": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "version",
+            "name",
+            "warn",
+            "deny"
+          ],
+          "properties": {
+            "version": {
+              "type": "string",
+              "minLength": 1
+            },
+            "name": {
+              "type": "string",
+              "minLength": 1
+            },
+            "warn": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "lef",
+                "lm"
+              ],
+              "properties": {
+                "lef": {
+                  "type": "array",
+                  "minItems": 3,
+                  "maxItems": 3,
+                  "items": {
+                    "type": "number",
+                    "minimum": 0
+                  }
+                },
+                "lm": {
+                  "anyOf": [
+                    {
+                      "type": "array",
+                      "minItems": 3,
+                      "maxItems": 3,
+                      "items": {
+                        "type": "number",
+                        "minimum": 0
+                      }
+                    },
+                    {
+                      "type": "array",
+                      "minItems": 1,
+                      "items": {
+                        "type": "array",
+                        "minItems": 3,
+                        "maxItems": 3,
+                        "items": {
+                          "type": "number",
+                          "minimum": 0
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "deny": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "lef",
+                "lm"
+              ],
+              "properties": {
+                "lef": {
+                  "type": "array",
+                  "minItems": 3,
+                  "maxItems": 3,
+                  "items": {
+                    "type": "number",
+                    "minimum": 0
+                  }
+                },
+                "lm": {
+                  "anyOf": [
+                    {
+                      "type": "array",
+                      "minItems": 3,
+                      "maxItems": 3,
+                      "items": {
+                        "type": "number",
+                        "minimum": 0
+                      }
+                    },
+                    {
+                      "type": "array",
+                      "minItems": 1,
+                      "items": {
+                        "type": "array",
+                        "minItems": 3,
+                        "maxItems": 3,
+                        "items": {
+                          "type": "number",
+                          "minimum": 0
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "note": {
+              "type": "string"
+            }
+          },
+          "description": "Existing finite bounded PERT FAIR scenario subset, exact same source/state arrangement; other severity families refuse this adapter."
+        },
+        "authority_action": {
+          "const": "preserve"
+        },
+        "affected_sources": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^/(warn|deny)/lm(/[0-9]+)?$"
+          }
+        }
+      }
+    },
+    "effect": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema",
+        "state",
+        "reason",
+        "report",
+        "profile",
+        "policy_source",
+        "target",
+        "criterion",
+        "eligible_cases",
+        "minimum_cases",
+        "score",
+        "bar",
+        "causes",
+        "base",
+        "effective",
+        "financial_as_of",
+        "reliability_evidence_as_of"
+      ],
+      "properties": {
+        "schema": {
+          "const": "publisher-reliability/effect-v1"
+        },
+        "state": {
+          "enum": [
+            "unmeasured",
+            "insufficient",
+            "accepted",
+            "widened"
+          ]
+        },
+        "reason": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "report": {
+          "$ref": "#/$defs/source_ref"
+        },
+        "profile": {
+          "$ref": "#/$defs/source_ref"
+        },
+        "policy_source": {
+          "$ref": "#/$defs/tree_file_ref"
+        },
+        "target": {
+          "$ref": "#/$defs/source_ref"
+        },
+        "criterion": {
+          "const": "money-empirical-crps/v1"
+        },
+        "eligible_cases": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "minimum_cases": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "score": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/score"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "bar": {
+          "type": "string",
+          "pattern": "^-?(0|[1-9][0-9]*)(\\.[0-9]+)?$",
+          "description": "Canonical exact decimal, no exponent wire encoding; bounded digits/exponent on input before normalization, no bool/float/nonfinite."
+        },
+        "causes": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "score-below-bar",
+              "release-degraded"
+            ]
+          }
+        },
+        "base": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "scenario",
+            "uncaged_price",
+            "tier"
+          ],
+          "properties": {
+            "scenario": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "version",
+                "name",
+                "warn",
+                "deny"
+              ],
+              "properties": {
+                "version": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "name": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "warn": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "lef",
+                    "lm"
+                  ],
+                  "properties": {
+                    "lef": {
+                      "type": "array",
+                      "minItems": 3,
+                      "maxItems": 3,
+                      "items": {
+                        "type": "number",
+                        "minimum": 0
+                      }
+                    },
+                    "lm": {
+                      "anyOf": [
+                        {
+                          "type": "array",
+                          "minItems": 3,
+                          "maxItems": 3,
+                          "items": {
+                            "type": "number",
+                            "minimum": 0
+                          }
+                        },
+                        {
+                          "type": "array",
+                          "minItems": 1,
+                          "items": {
+                            "type": "array",
+                            "minItems": 3,
+                            "maxItems": 3,
+                            "items": {
+                              "type": "number",
+                              "minimum": 0
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  }
+                },
+                "deny": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "lef",
+                    "lm"
+                  ],
+                  "properties": {
+                    "lef": {
+                      "type": "array",
+                      "minItems": 3,
+                      "maxItems": 3,
+                      "items": {
+                        "type": "number",
+                        "minimum": 0
+                      }
+                    },
+                    "lm": {
+                      "anyOf": [
+                        {
+                          "type": "array",
+                          "minItems": 3,
+                          "maxItems": 3,
+                          "items": {
+                            "type": "number",
+                            "minimum": 0
+                          }
+                        },
+                        {
+                          "type": "array",
+                          "minItems": 1,
+                          "items": {
+                            "type": "array",
+                            "minItems": 3,
+                            "maxItems": 3,
+                            "items": {
+                              "type": "number",
+                              "minimum": 0
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  }
+                },
+                "note": {
+                  "type": "string"
+                }
+              },
+              "description": "Existing finite bounded PERT FAIR scenario subset, exact same source/state arrangement; other severity families refuse this adapter."
+            },
+            "uncaged_price": {
+              "type": "string",
+              "pattern": "^-?(0|[1-9][0-9]*)(\\.[0-9]+)?$",
+              "description": "Canonical exact decimal, no exponent wire encoding; bounded digits/exponent on input before normalization, no bool/float/nonfinite."
+            },
+            "tier": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "effective": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "scenario",
+            "uncaged_price",
+            "tier"
+          ],
+          "properties": {
+            "scenario": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "version",
+                "name",
+                "warn",
+                "deny"
+              ],
+              "properties": {
+                "version": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "name": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "warn": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "lef",
+                    "lm"
+                  ],
+                  "properties": {
+                    "lef": {
+                      "type": "array",
+                      "minItems": 3,
+                      "maxItems": 3,
+                      "items": {
+                        "type": "number",
+                        "minimum": 0
+                      }
+                    },
+                    "lm": {
+                      "anyOf": [
+                        {
+                          "type": "array",
+                          "minItems": 3,
+                          "maxItems": 3,
+                          "items": {
+                            "type": "number",
+                            "minimum": 0
+                          }
+                        },
+                        {
+                          "type": "array",
+                          "minItems": 1,
+                          "items": {
+                            "type": "array",
+                            "minItems": 3,
+                            "maxItems": 3,
+                            "items": {
+                              "type": "number",
+                              "minimum": 0
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  }
+                },
+                "deny": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "lef",
+                    "lm"
+                  ],
+                  "properties": {
+                    "lef": {
+                      "type": "array",
+                      "minItems": 3,
+                      "maxItems": 3,
+                      "items": {
+                        "type": "number",
+                        "minimum": 0
+                      }
+                    },
+                    "lm": {
+                      "anyOf": [
+                        {
+                          "type": "array",
+                          "minItems": 3,
+                          "maxItems": 3,
+                          "items": {
+                            "type": "number",
+                            "minimum": 0
+                          }
+                        },
+                        {
+                          "type": "array",
+                          "minItems": 1,
+                          "items": {
+                            "type": "array",
+                            "minItems": 3,
+                            "maxItems": 3,
+                            "items": {
+                              "type": "number",
+                              "minimum": 0
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  }
+                },
+                "note": {
+                  "type": "string"
+                }
+              },
+              "description": "Existing finite bounded PERT FAIR scenario subset, exact same source/state arrangement; other severity families refuse this adapter."
+            },
+            "uncaged_price": {
+              "type": "string",
+              "pattern": "^-?(0|[1-9][0-9]*)(\\.[0-9]+)?$",
+              "description": "Canonical exact decimal, no exponent wire encoding; bounded digits/exponent on input before normalization, no bool/float/nonfinite."
+            },
+            "tier": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "financial_as_of": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+        },
+        "reliability_evidence_as_of": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$"
+        }
+      }
+    },
+    "error": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema",
+        "kind",
+        "code",
+        "reason"
+      ],
+      "properties": {
+        "schema": {
+          "const": "publisher-reliability/error-v1"
+        },
+        "kind": {
+          "const": "instrument-refusal"
+        },
+        "code": {
+          "enum": [
+            "unsupported-profile",
+            "invalid-record",
+            "invalid-money",
+            "resource-limit",
+            "source-authentication",
+            "source-binding",
+            "registration-history",
+            "population-binding",
+            "generator-mismatch",
+            "resolution-binding",
+            "missing-instrument",
+            "target-invalid",
+            "authority-rewrite",
+            "historical-proof-missing"
+          ]
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "input_set": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema",
+        "cohorts"
+      ],
+      "properties": {
+        "schema": {
+          "const": "publisher-reliability/price-input-set-v1"
+        },
+        "cohorts": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/inputs"
+          }
+        }
+      }
+    },
+    "report_set": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema",
+        "scorer",
+        "cutoff",
+        "tool",
+        "inputs",
+        "reports",
+        "reason"
+      ],
+      "properties": {
+        "schema": {
+          "const": "publisher-reliability/price-report-set-v1"
+        },
+        "scorer": {
+          "type": "string",
+          "minLength": 1
+        },
+        "cutoff": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$"
+        },
+        "tool": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "source_files",
+            "generator_engine"
+          ],
+          "properties": {
+            "source_files": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/tree_file_ref"
+              }
+            },
+            "generator_engine": {
+              "$ref": "#/$defs/source_ref"
+            }
+          }
+        },
+        "inputs": {
+          "$ref": "#/$defs/input_set"
+        },
+        "reports": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/report"
+          }
+        },
+        "reason": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    }
+  },
+  "$ref": "#/$defs/report_set"
+}
