@@ -53,3 +53,4 @@
 {"bump": "none", "feed": "threat-register", "observed_at": "2026-10-28T09:38:19+00:00", "payload_sha256": "9cfab6d3d14cb395242061a8bae8400594f58e5792f00b24059d9c16672818b1", "published_version": "4.1.0"}
 {"bump": "none", "feed": "threat-register", "observed_at": "2026-10-29T09:56:24+00:00", "payload_sha256": "9cfab6d3d14cb395242061a8bae8400594f58e5792f00b24059d9c16672818b1", "published_version": "4.1.0"}
 {"bump": "none", "feed": "threat-register", "observed_at": "2026-10-30T09:59:06+00:00", "payload_sha256": "9cfab6d3d14cb395242061a8bae8400594f58e5792f00b24059d9c16672818b1", "published_version": "4.1.0"}
+{"bump": "none", "feed": "threat-register", "observed_at": "2026-10-31T09:37:13+00:00", "payload_sha256": "9cfab6d3d14cb395242061a8bae8400594f58e5792f00b24059d9c16672818b1", "published_version": "4.1.0"}
