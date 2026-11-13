@@ -65,3 +65,4 @@
 {"bump": "major", "feed": "fx", "observed_at": "2026-11-10T11:10:23+00:00", "payload_sha256": "3062828d54e4ad8576bc40c06d2f37949d51c95294e32444c2e8a65156d24e7c", "published_version": "2.0.0"}
 {"bump": "major", "feed": "fx", "observed_at": "2026-11-11T10:56:05+00:00", "payload_sha256": "3062828d54e4ad8576bc40c06d2f37949d51c95294e32444c2e8a65156d24e7c", "published_version": "2.0.0"}
 {"bump": "major", "feed": "fx", "observed_at": "2026-11-12T11:05:33+00:00", "payload_sha256": "3062828d54e4ad8576bc40c06d2f37949d51c95294e32444c2e8a65156d24e7c", "published_version": "2.0.0"}
+{"bump": "major", "feed": "fx", "observed_at": "2026-11-13T10:58:17+00:00", "payload_sha256": "3062828d54e4ad8576bc40c06d2f37949d51c95294e32444c2e8a65156d24e7c", "published_version": "2.0.0"}
