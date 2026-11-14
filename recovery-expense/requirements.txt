@@ -1,3 +1,0 @@
-# Direct bundle-validation dependencies used in the recorded pure regression environment.
-PyYAML==6.0.3
-jsonschema==4.26.0

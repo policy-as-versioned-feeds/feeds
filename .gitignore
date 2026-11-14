@@ -1,5 +1,1 @@
 __pycache__/
-.fetch/
-
-# nested ticket worktrees (see the hub build brief); never content
-.work/

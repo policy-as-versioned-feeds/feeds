@@ -1,5 +1,0 @@
-# ADR-0035: membership and NVD severity bands release; dated EPSS is observed every run.
-changed_when: "KEV membership or severity band changes"
-entries: cves
-numeric_tolerance: 0.05
-entry_release_fields: severity
