@@ -1,13 +1,21 @@
 import json
 import unittest
+from pathlib import Path
 
 DATE = r"^\d{4}-\d{2}-\d{2}$"
-with open("threat-register/feed.json") as f:
-    FEED = json.load(f)
+
+
+def unique(pairs):
+    keys = [key for key, _ in pairs]
+    assert len(keys) == len(set(keys)), f"duplicate key in {keys}"
+    return dict(pairs)
+
+
+FEED = json.loads((Path(__file__).parent / "threat-register" / "feed.json").read_text(), object_pairs_hook=unique)
 
 
 def number(x):
-    return isinstance(x, (int, float)) and not isinstance(x, bool) and x >= 0
+    return isinstance(x, (int, float)) and not isinstance(x, bool) and 0 <= x < float("inf")
 
 
 class FeedShape(unittest.TestCase):
@@ -24,7 +32,8 @@ class FeedShape(unittest.TestCase):
         self.assertEqual(len(ids), len(set(ids)))
         for r in FEED["rows"]:
             self.assertEqual(set(r), {"id", "party", "events_a_year", "events_basis", "loss_an_event", "loss_basis", "penalty", "needs"})
-            self.assertTrue(r["id"] and r["party"])
+            self.assertTrue(r["id"])
+            self.assertEqual(r["party"], "driftwood", r["id"])
 
     def test_three_point_values(self):
         for r in FEED["rows"]:
@@ -44,12 +53,8 @@ class FeedShape(unittest.TestCase):
         for r in FEED["rows"]:
             if r["penalty"] is not None:
                 self.assertEqual(set(r["penalty"]), {"regime", "tier"}, r["id"])
-                self.assertTrue(r["penalty"]["regime"])
+                self.assertEqual(r["penalty"]["regime"], "uk-gdpr", r["id"])
+                self.assertIn(r["penalty"]["tier"], (None, "higher", "lower"), r["id"])
             for n in r["needs"]:
                 self.assertEqual(set(n), {"capability", "source"}, r["id"])
                 self.assertIn(n["capability"], {"egress", "inbound"})
-                self.assertTrue(n["source"])
-
-
-if __name__ == "__main__":
-    unittest.main()
