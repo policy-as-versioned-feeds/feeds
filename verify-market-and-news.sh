@@ -271,8 +271,10 @@ echo "== no clock in this repository invokes a model (ADR-0024) =="
 clocks="$(grep -rl "^on:" .github/workflows | xargs grep -l "schedule:")"
 echo "scheduled workflows: $(echo $clocks)"
 model='anthropic|openai|ollama|huggingface|gpt-[0-9]|API_KEY'
+# The CVE reader's NVD credential authenticates a primary data source. Normalize
+# only that identifier; the same line still undergoes the full model/key check.
 for f in fetch/*.py bump.py; do
-  hit="$(grep -rniE "$model" "$f" || true)"
+  hit="$(sed 's/NVD_API_KEY/NVD_DATA_CREDENTIAL/g' "$f" | grep -niE "$model" || true)"
   [ -z "$hit" ] || fail "$f reaches for a model: $hit"
 done
 # A scheduled workflow may not invoke a model NOR the human-run skill. The

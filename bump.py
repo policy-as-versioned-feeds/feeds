@@ -163,6 +163,17 @@ def compute(old, new, rule):
         return "minor"
 
     old_payload, new_payload = old.get("payload", {}), new.get("payload", {})
+    release_fields = rule.get("entry_release_fields")
+    if release_fields:
+        fields = str(release_fields).split(",")
+        if any({field: old_entries[key].get(field) for field in fields} !=
+               {field: new_entries[key].get(field) for field in fields} for key in old_entries):
+            return "patch"
+        # ADR-0035: CVSS/EPSS and source dates are observations within the same
+        # severity band. Magnitude bands/currency/schema still change a price.
+        stable = ("severity_lm_gbp", "currency")
+        return "patch" if any(old.get("payload", {}).get(k) != new.get("payload", {}).get(k)
+                              for k in stable) else "none"
     if old_payload == new_payload:
         return "none"
 

@@ -83,16 +83,20 @@ schema), anything else observed false. It is one of the scripts
 
 ## Honest edges
 
-- **The fetch is a fixture.** `fetch/source/<feed>.json` stands in for the
-  upstream GET, so the clock, the rule, the PR path and the observation path are
-  all real and testable offline while the network is not. Each `fetch/<feed>.py`
-  names the upstream it will read. Upgrade path: swap `lib.read_upstream()` for a
-  `urllib.request` call — nothing downstream changes.
-- **The payloads are the migrated originals, byte for byte.** Each still carries
-  its own `feed_version: "v1"` and `published_by: "platform"` inside the body.
-  The envelope, not the body, is now authoritative for both: the body's copies
-  are frozen history and a consumer must read `version` and `published_by` off
-  the envelope.
+- **CVE and FX read primary sources on the clock.** CVE joins CISA KEV membership,
+  NVD CVSS severity and FIRST's dated EPSS reading; a missing joined record refuses.
+  FX reads HMRC's monthly CSV for the current UTC month; `FEEDS_FX_PERIOD` selects
+  a reviewed historical month. `FEEDS_SOURCE_DIR=fetch/source` supplies committed
+  offline replay inputs. The CVE replay preserves the build inputs and hashes of
+  the original complete responses; the FX replay contains the captured August
+  2026 HMRC payload. Neither replay claims a new observation date. Other adapters
+  still read their committed fixture corpora through `lib.read_upstream()`.
+- **Old major payloads remain frozen history.** The migrated originals carry
+  their former body-level `feed_version` and `published_by`; the envelope is
+  authoritative. CVE v3 replaces the illustrative entries with the captured
+  primary-source corpus. Threat-register v4 adds a cited frequency row and keeps
+  v3 headline magnitudes unchanged. FX 1.1.0 replaces the illustrative August
+  rates with that month's authentic HMRC rates, using the same payload schema.
 - **The old `.sig` files did not come with them.** They signed the payload under a
   repo-local ed25519 demo key. One signature, the tag (ADR-0019 point 2).
 - **`market-moves` reads one venue, mechanically, and publishes a SERIES.**

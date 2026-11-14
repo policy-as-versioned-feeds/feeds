@@ -7,11 +7,10 @@ either stage a release PR or record one observation. It never decides: a bump
 that is not "none" becomes a pull request a human merges, and nothing here
 writes to main.
 
-ponytail: "upstream" is a committed fixture under `fetch/source/<feed>.json`,
-so the clock, the bump rule, the PR path and the observation path are all real
-and testable offline while the network is not. Upgrade path: replace
-`read_upstream()` with a `urllib.request.urlopen(upstream_url)` and a parse
-into the same payload shape -- everything downstream of it already works.
+An adapter may supply a primary-source reader. CVE and FX do so; the other
+adapters use `read_upstream()` and their committed fixture corpora. Setting
+FEEDS_SOURCE_DIR selects offline replay input explicitly for every adapter.
+The clock, bump rule, proposal and observation paths are shared by both modes.
 
 Standard library only: the runner is not promised pyyaml.
 """
@@ -89,12 +88,12 @@ def observation(feed, current, bump, reading=None):
     return line
 
 
-def main(feed, upstream_url, build=None, reading=None):
+def main(feed, upstream_url, build=None, reading=None, source=None):
     """`build(published_payload, upstream)` turns a raw upstream corpus into the
     next payload for feeds whose upstream is not already a payload (the
     market-moves venue corpus, the news pool). `reading(payload)` is what the
-    observation line carries beside the hash. Both default to off, so the four
-    feeds that came before this are untouched."""
+    observation line carries beside the hash. `source()` reads a primary
+    instrument unless FEEDS_SOURCE_DIR explicitly selects offline replay."""
     parser = argparse.ArgumentParser(description=f"scheduled fetch for the {feed} feed")
     parser.add_argument("--observations-dir", default=os.path.join(ROOT, "observations"),
                         help="where to append <feed>.jsonl when the bump is none "
@@ -108,7 +107,7 @@ def main(feed, upstream_url, build=None, reading=None):
         current = json.load(fh)
     rule = bump_engine.load_rule(os.path.join(ROOT, feed, "rule.yaml"))
 
-    upstream = read_upstream(feed)
+    upstream = source() if source is not None and not os.environ.get("FEEDS_SOURCE_DIR") else read_upstream(feed)
     candidate = dict(current)
     candidate["payload"] = build(current["payload"], upstream) if build else upstream
     candidate["published_at"] = dt.datetime.now(dt.timezone.utc).isoformat(timespec="seconds")
