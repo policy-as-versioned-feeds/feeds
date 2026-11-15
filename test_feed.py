@@ -20,10 +20,9 @@ def number(x):
 
 class FeedShape(unittest.TestCase):
     def test_envelope(self):
-        self.assertEqual(set(FEED), {"feed", "version", "published_by", "published_at", "currency", "note", "rows"})
-        self.assertEqual((FEED["feed"], FEED["published_by"], FEED["currency"]), ("threat-register", "feeds", "GBP"))
+        self.assertEqual(set(FEED), {"version", "currency", "note", "rows"})
+        self.assertEqual(FEED["currency"], "GBP")
         self.assertRegex(FEED["version"], r"^[0-9]+\.[0-9]+\.[0-9]+$")
-        self.assertRegex(FEED["published_at"], DATE)
         self.assertTrue(FEED["note"].startswith("A demonstration party, not affiliated with"))
 
     def test_rows(self):
@@ -58,3 +57,4 @@ class FeedShape(unittest.TestCase):
             for n in r["needs"]:
                 self.assertEqual(set(n), {"capability", "source"}, r["id"])
                 self.assertIn(n["capability"], {"egress", "inbound"})
+                self.assertTrue(n["source"], r["id"])
