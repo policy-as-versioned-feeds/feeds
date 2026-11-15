@@ -24,9 +24,9 @@ The feed holds three rows, all for `driftwood`. The numbers are editorial or pub
 1. Open a pull request that changes `threat-register/feed.json`. Change `version` in the same pull request.
 2. The `test` job runs `test_feed.py` on the pull request. It checks the shape of every row.
 3. The app approves and merges it from the orchestrator's session once `test` is green.
-4. A tag `threat-register/v<version>` is signed with the workflow's own identity and pushed. Dispatching `cut-release` does it by hand. Setting the repository variable `CUT_ON_MERGE` to `true` does it on each merge that changes `version`.
+4. A tag `threat-register/v<version>` is signed with the workflow's own identity and pushed. `CUT_ON_MERGE` is `true`, so each merge that changes `version` cuts the tag. Dispatching `cut-release` does it by hand.
 5. If the feed changes and `version` does not, the cut ends red. A tag never moves.
 
-Readers pin a commit or a tag. In act mode, Driftwood follows the new commit or tag by itself.
+Readers pin a signed tag and its commit. In act mode, Driftwood follows a new tag by itself.
 
 To run the tests: `python3 -m unittest -v test_feed`.
