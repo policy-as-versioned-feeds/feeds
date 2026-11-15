@@ -1,5 +1,5 @@
-{"feed": "threat-register", "version": "5.1.0", "published_by": "feeds", "published_at": "2026-11-15", "currency": "GBP",
- "note": "A demonstration party, not affiliated with, endorsed by or speaking for any real authority it names. One row is one way a loss happens. Overlapping rows are never summed.",
+{"version": "5.2.0", "currency": "GBP",
+ "note": "A demonstration party, not affiliated with, endorsed by or speaking for any real authority it names. One row is one way a loss happens. The reader adds every open row, so rows must not overlap.",
  "rows": [
   {"id": "checkout-pii-exfiltration", "party": "driftwood",
    "events_a_year": [2, 4, 9],
